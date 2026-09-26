@@ -52,7 +52,7 @@ Apache (Hostinger compartilhado) + PHP 8
    ↓
 ┌───────────────────────────────┬───────────────────────────────┐
 │ Site público                  │ Área administrativa (/admin)  │
-│ Home (serviços/profissionais) │ Login (sessão + CSRF)         │
+│ Home (serviços/profissionais) │ Login (senha + 2FA e-mail)    │
 │ Agendar (calendário + form)   │ Serviços (CRUD)               │
 │ Contato / WhatsApp            │ Profissionais (CRUD)          │
 │                               │ Disponibilidade (CRUD)        │
@@ -72,22 +72,30 @@ Regra de ouro: **componente visual não contém regra de negócio**. Consultas e
 
 ## 4. Modelo de dados (MySQL)
 
+Todo `id` (e toda FK) é **UUID v7 em `CHAR(36)`**, gerado no PHP (`gerarUuid()`); o seed usa valores fixos. MySQL/MariaDB não têm RLS — o controle de acesso a linhas/colunas é feito nos repositories (ver §9 e `RULES.md` §10).
+
 ```sql
-usuarios          -- login administrativo
+administradores   -- login administrativo (papel único)
   id, nome, email (unique), senha_hash, criado_em
+
+codigos_2fa       -- 2FA por e-mail: só hash do código, uso único
+  id, administrador_id (FK, ON DELETE CASCADE), codigo_hash,
+  expira_em, tentativas, usado_em (nullable), criado_em
 
 profissionais
   id, nome, especialidade, bio, foto_url, ativo (bool), criado_em
 
 servicos
-  id, nome, descricao, duracao_min (int), preco (decimal), categoria,
+  id, nome, descricao, duracao_min (int), preco (decimal, nullable → "Consultar valor"),
+  categoria, imagem_url, icone, cor, tag (apresentação do card, todos nullable),
   ativo (bool), ordem (int)
 
 profissional_servico          -- N:N: quais serviços cada profissional faz
   profissional_id, servico_id  -- PK composta
 
 disponibilidade               -- recorrente por dia da semana
-  id, profissional_id, dia_semana (0-6), hora_inicio (time), hora_fim (time)
+  id, profissional_id, dia_semana (0=domingo … 6=sábado, como date('w')),
+  hora_inicio (time), hora_fim (time)
 
 agendamentos
   id, servico_id, profissional_id,
@@ -102,6 +110,7 @@ Integridade e proteção contra overbooking:
 - FKs: `agendamentos.servico_id → servicos.id`, `agendamentos.profissional_id → profissionais.id`; `disponibilidade.profissional_id → profissionais.id`.
 - **Índice único** `(profissional_id, data, hora_inicio)` em `agendamentos` — rede de segurança contra corrida, além da validação em `slots.php`.
 - `ON DELETE`: preferir desativar (`ativo=0`) a apagar; não apagar profissional/serviço com agendamentos futuros (validar no admin).
+- DDL + seed em **migrações numeradas** `sql/migrations/NNN_descricao.sql` (raiz do repositório, **fora** de `public_html/`); a tabela `migracoes (versao, aplicada_em)` registra o que já foi aplicado em cada ambiente. Regras em `RULES.md` §10.1. O seed não inclui administrador — ele é criado na Fase 2 por script local, sem senha versionada.
 
 > `ponytail:` disponibilidade recorrente por dia da semana é o mínimo que cobre o caso. Tabela `bloqueios(data, profissional_id)` para feriados/folgas entra só quando aprovada (fora do escopo atual — ver Plano Mestre §2). `profissional_servico` pode ser removida se houver só uma profissional.
 
@@ -116,8 +125,9 @@ public_html/
 ├── config.php               # credenciais do banco — protegido por .htaccess
 ├── .htaccess                # nega acesso a config/includes; força HTTPS
 ├── includes/
-│   ├── db.php               # conexão PDO única
-│   ├── auth.php             # sessão, login/logout, CSRF, require_admin()
+│   ├── db.php               # conexão PDO única + gerarUuid() (v7)
+│   ├── auth.php             # sessão, login/logout, 2FA, require_admin()
+│   ├── mailer.php           # envio via PHPMailer + SMTP Hostinger
 │   ├── csrf.php             # geração/validação de token
 │   ├── slots.php            # geração de horários e validação de conflito
 │   ├── repositories.php     # consultas (serviços, profissionais, agendamentos)
@@ -126,7 +136,7 @@ public_html/
 │   └── slots.php            # JSON: horários livres p/ serviço+profissional+data
 ├── admin/
 │   ├── index.php            # dashboard (próximos agendamentos)
-│   ├── login.php · logout.php
+│   ├── login.php · verificar.php · logout.php   # senha → código 2FA → painel
 │   ├── servicos.php
 │   ├── profissionais.php
 │   ├── disponibilidade.php
@@ -136,9 +146,12 @@ public_html/
 │   ├── app.js               # interações públicas
 │   ├── admin.js             # interações do painel (Bootstrap)
 │   └── img/                 # imagens baixadas do genspark (Fase 6)
-├── favicon.svg
-└── sql/
-    └── schema.sql           # DDL + seed
+├── vendor/                  # Composer (PHPMailer) — bloqueado no .htaccess
+└── favicon.svg
+
+sql/                         # raiz do repositório — NÃO sobe para public_html
+└── migrations/              # aplicadas em ordem via phpMyAdmin/CLI
+    └── 001_schema_inicial.sql   # tabelas + seed + tabela migracoes
 ```
 
 Convenção: código de acesso a dados vive em `includes/`; páginas (`*.php`) só orquestram e renderizam. `config.php` e `includes/` nunca são servidos diretamente (bloqueio no `.htaccess`).
@@ -150,6 +163,8 @@ Convenção: código de acesso a dados vive em `includes/`; páginas (`*.php`) s
 - **`db.php`**: instancia um único `PDO` com `ERRMODE_EXCEPTION`, `charset=utf8mb4`, `PDO::ATTR_EMULATE_PREPARES=false`.
 - **`auth.php`**: `session_start()` com cookie `HttpOnly`, `Secure`, `SameSite=Lax`; `login()` usa `password_verify`; `require_admin()` redireciona para `login.php` se não houver sessão.
 - **`csrf.php`**: token por sessão, validado em todo POST (público e admin).
+- **`mailer.php`**: PHPMailer com `smtp.hostinger.com`, porta 465 (SSL) — 587/STARTTLS como alternativa; usuário = e-mail completo da caixa dedicada, senha = senha da caixa (em `config.php`, nunca versionada).
+- **Criação do admin**: script CLI local que pede nome, e-mail e senha no terminal e grava `password_hash` — nenhuma senha ou hash no repositório.
 - Nunca acessar `$_POST`/`$_GET` sem validar; nunca concatenar SQL — sempre prepared statements. Ver `RULES.md` §10.
 
 ---
@@ -188,10 +203,17 @@ Acessa /admin/*
    ↓
 require_admin() verifica sessão
    ↓ sem sessão → redireciona /admin/login.php
-login.php: valida CSRF → password_verify → cria sessão → regenera id de sessão
+login.php: valida CSRF → password_verify
+   ↓ senha ok → sessão "pendente 2FA" (ainda sem acesso ao painel)
+gera código de 6 dígitos (random_int) → grava só o hash em codigos_2fa
+   (validade 10 min, máx. 5 tentativas, uso único) → envia por e-mail
    ↓
+verificar.php: valida CSRF → confere hash, validade e tentativas
+   ↓ ok → marca usado_em → regenera id de sessão → sessão admin completa
 libera o painel (papel único: admin)
 ```
+
+Regras do 2FA: reenvio no mínimo a cada 60 s; ao gerar um código novo, os anteriores daquele admin deixam de valer; mensagem de erro não revela se o e-mail existe; não existe caminho no código para pular o 2FA.
 
 Só existe o papel `admin`. RBAC com múltiplos papéis está fora do escopo atual (Plano Mestre §2).
 
@@ -233,8 +255,8 @@ Telefone e e-mail de cliente são dados pessoais: nunca exibidos em página púb
 ## 12. Deploy (Fase 7 — Hostinger compartilhado)
 
 1. hPanel → criar banco MySQL + usuário; anotar credenciais.
-2. hPanel → Bancos → phpMyAdmin → importar `sql/schema.sql`.
-3. Subir o conteúdo de `public_html/` via Gerenciador de Arquivos ou FTP para a raiz `public_html`.
+2. hPanel → Bancos → phpMyAdmin → importar os arquivos de `sql/migrations/` **em ordem numérica**, só os que ainda não constam em `SELECT * FROM migracoes`.
+3. Subir o conteúdo de `public_html/` (sem `sql/`) via Gerenciador de Arquivos ou FTP para a raiz `public_html`.
 4. Editar `config.php` no servidor com as credenciais (não versionar).
 5. hPanel → SSL → ativar certificado grátis; forçar HTTPS no `.htaccess`.
 6. Testar: home, agendamento ponta a ponta, login admin, CRUD.

@@ -28,12 +28,16 @@ A decisão do cliente (Jose) foi **evoluir para uma aplicação com backend**, a
 | Site público | HTML/CSS/JS atuais, tornados **dinâmicos** | Preserva 100% a identidade visual (ver `DESIGN-SYSTEM.md`). |
 | Painel admin | **Bootstrap 5** | Componentes prontos aceleram CRUD administrativo. |
 | Qualidade | **ESLint** (JS) + **PHPStan/PHP_CodeSniffer** (PHP) + **PHPUnit** (testes) | Gates adaptados à stack — ver `RULES.md` §11. |
+| Identificadores | **UUID v7 em `CHAR(36)`**, gerado no PHP | IDs não sequenciais/não adivinháveis; v7 é ordenado no tempo (não fragmenta índice); funciona igual no MariaDB 10.4 local e na Hostinger. |
+| Controle de acesso a dados | **Na camada PHP** (repositories), sem RLS | MySQL/MariaDB não têm Row Level Security. Com papel único (`admin`) e sem dados por cliente logado, repositories como porta única + colunas explícitas + `requireAdmin()` cobrem o caso. |
+| 2FA do admin | **Código por e-mail** via **SMTP Hostinger** + **PHPMailer** | `smtp.hostinger.com:465` (SSL), autenticação com e-mail + senha da própria caixa (a Hostinger não gera senha de aplicativo). `mail()` nativo não faz SMTP autenticado de forma confiável. |
 
 ### 0.2. Stack descartada e por quê
 
 - **Java Spring Boot** — descartado: **não roda no plano compartilhado** da Hostinger (exigiria VPS/KVM com JDK). Registrado aqui para não ser reproposto sem uma decisão consciente de trocar de hospedagem.
 - **React/Vue/Angular** — descartado: página institucional de baixa interatividade; framework só adicionaria peso e passo de build sem ganho real.
 - **Node.js** — descartado: nada precisa rodar como serviço persistente; PHP por requisição atende.
+- **PostgreSQL/Supabase (por causa de RLS)** — descartado em 2026-09-25: o compartilhado da Hostinger não oferece Postgres; exigiria banco externo (novo provedor, mais latência) para um ganho pequeno com papel único.
 
 ---
 
@@ -54,13 +58,13 @@ A decisão do cliente (Jose) foi **evoluir para uma aplicação com backend**, a
 - cadastro de profissionais;
 - controle de disponibilidade (dias da semana + faixas de horário por profissional);
 - motor de agendamento com validação de conflito no servidor;
-- painel administrativo autenticado (login por senha) com Bootstrap;
+- painel administrativo autenticado (login por senha **+ 2FA com código por e-mail**) com Bootstrap;
 - site público dinâmico preservando o visual atual.
 
 **Fora do escopo por ora (adicionar só com nova aprovação):**
 
 - pagamento online;
-- notificação automática por e-mail/WhatsApp na confirmação (o admin confirma manualmente);
+- notificação automática por e-mail/WhatsApp na confirmação (o admin confirma manualmente) — o único e-mail do sistema é o código de 2FA do admin;
 - tabela de bloqueios/folgas de datas específicas (feriados);
 - múltiplos papéis de acesso (só existe o papel `admin`);
 - CRUD dos "pacotes" (permanecem estáticos no site até haver aprovação);
@@ -74,13 +78,13 @@ Cada fase só inicia após a anterior estar concluída, testada e aprovada (flux
 
 | Fase | Entrega | Depende de | Doc de referência |
 |---|---|---|---|
-| **1. Banco** | `sql/schema.sql` + seed com serviços/profissional atuais | — | `ARCHITECTURE.md` §4 |
-| **2. Fundação PHP** | conexão PDO, `config.php` protegido, sessão + login admin, CSRF, `.htaccess` | 1 | `ARCHITECTURE.md` §6, `RULES.md` §10 |
+| **1. Banco** | `sql/migrations/001_schema_inicial.sql` + tabela `migracoes` (UUID v7, `administradores`, `codigos_2fa`) + seed com serviços/profissional atuais | — | `ARCHITECTURE.md` §4 |
+| **2. Fundação PHP** | conexão PDO, `config.php` protegido, sessão + login admin **com 2FA por e-mail (PHPMailer + SMTP Hostinger)**, CSRF, `.htaccess`, script local de criação do admin | 1 | `ARCHITECTURE.md` §6 e §8, `RULES.md` §10 |
 | **3. Site público dinâmico** | `index.php`: serviços e profissionais vindos do banco, visual intacto | 2 | `DESIGN-SYSTEM.md` |
 | **4. Motor + fluxo de agendamento** | `agendar.php` + `includes/slots.php` (cálculo/validação) + **teste PHPUnit**; grava `pendente` | 3 | `API.md` §2, `ARCHITECTURE.md` §7 |
 | **5. Painel admin (Bootstrap)** | CRUD serviços, profissionais, disponibilidade; lista de agendamentos com troca de status | 2 | `DESIGN-SYSTEM.md` §admin |
 | **6. Imagens** | baixar as 10 imagens hoje hotlinkadas de `genspark.ai` para `static/img/` | 3 | risco §5 |
-| **7. Deploy Hostinger** | criar MySQL no hPanel, importar `schema.sql`, subir arquivos, ativar SSL, configurar `config.php` | 1–6 | `ARCHITECTURE.md` §12 |
+| **7. Deploy Hostinger** | criar MySQL no hPanel, importar as migrações em ordem, subir arquivos, ativar SSL, configurar `config.php` | 1–6 | `ARCHITECTURE.md` §12 |
 | **8. Limpeza** | remover Hono/Cloudflare/Vite/Wrangler do repositório | 7 | — |
 
 ---
@@ -107,6 +111,8 @@ Jose conduz o fluxo Git. O agente sugere comandos e explica, mas **não executa 
 | Imagens hotlinkadas de `genspark.ai` | Links externos podem cair e quebrar o visual | Fase 6: baixar tudo para `static/img/`. |
 | Credenciais MySQL em `config.php` no compartilhado | Exposição de segredo | `config.php` fora da árvore pública quando possível; senão, `.htaccess` bloqueando acesso direto; nunca versionar. Ver `RULES.md` §10. |
 | Overbooking por corrida em agendamento | Dois clientes no mesmo horário | Validação de conflito no servidor + índice único no banco (ver `ARCHITECTURE.md` §4). Coberto por teste (Fase 4). |
+| E-mail do 2FA não chega (spam, SMTP fora) → admin trancado fora | Painel inacessível | Caixa dedicada no domínio com SPF/DKIM configurados no hPanel; testes sempre com o SMTP real; recuperação via script local/phpMyAdmin (sem "pular 2FA" no código). |
+| Senha da caixa SMTP em `config.php` | Envio de e-mail em nome do domínio | Mesmo tratamento das credenciais MySQL: fora da árvore pública/bloqueado no `.htaccess`, nunca versionado; caixa dedicada só para envio. |
 | Sem VPS → sem processos de fundo | Não há como rodar filas/cron sofisticados | Escopo atual não exige; agendamento é síncrono. |
 
 ---
