@@ -29,16 +29,17 @@ Ainda assim, cada handler segue um contrato documentado (seção 5) para manter 
 - Status: planejado (Fase 4).
 - Visibilidade: **pública**.
 - Autenticação: não exige.
-- Parâmetros (query): `servico` (int), `profissional` (int), `data` (`YYYY-MM-DD`).
+- Parâmetros (query): `servico` (UUID), `profissional` (UUID), `data` (`YYYY-MM-DD`).
 - Resposta de sucesso (`200`):
 
 ```json
-{ "servico_id": 3, "profissional_id": 1, "data": "2026-10-02",
-  "duracao_min": 60, "horarios": ["09:00", "10:00", "14:00"] }
+{ "servico_id": "01a0db02-f803-7481-8c64-693c404ead75",
+  "profissional_id": "01a0db02-f800-76df-a6eb-97a169b3083f",
+  "data": "2026-10-02", "duracao_min": 60, "horarios": ["09:00", "10:00", "14:00"] }
 ```
 
 - Respostas de erro:
-  - `400`: parâmetro ausente/inválido (data no passado, ids não numéricos).
+  - `400`: parâmetro ausente/inválido (data no passado, id que não é UUID válido).
   - `429`: rate limit por IP excedido (proteção contra varredura da agenda).
 - Observações de segurança:
   - parâmetros validados e convertidos antes de qualquer consulta;
@@ -52,7 +53,7 @@ Ainda assim, cada handler segue um contrato documentado (seção 5) para manter 
 - Status: planejado (Fase 4).
 - Visibilidade: **pública**.
 - Autenticação: não exige. **Exige token CSRF** válido.
-- Body (form-urlencoded): `servico_id`, `profissional_id`, `data`, `hora_inicio`, `cliente_nome`, `cliente_telefone`, `cliente_email` (opcional), `observacao` (opcional), `csrf_token`.
+- Body (form-urlencoded): `servico_id` (UUID), `profissional_id` (UUID), `data`, `hora_inicio`, `cliente_nome`, `cliente_telefone`, `cliente_email` (opcional), `observacao` (opcional), `csrf_token`.
 - Regras de validação no servidor (obrigatórias, não confiar no front):
   1. serviço e profissional existem e estão ativos, e o profissional faz o serviço;
   2. `hora_inicio` cai dentro de uma faixa de `disponibilidade` daquele dia da semana;
@@ -71,11 +72,12 @@ Ainda assim, cada handler segue um contrato documentado (seção 5) para manter 
 
 ## 3. Ações administrativas (`/admin/**`)
 
-Todas exigem **sessão autenticada** (`require_admin()`) + **token CSRF** em todo POST. Sem sessão → redireciona para `login.php`. Papel único: `admin`.
+Todas exigem **sessão autenticada com 2FA concluído** (`require_admin()`) + **token CSRF** em todo POST. Sem sessão → redireciona para `login.php`. Papel único: `admin`.
 
 | Recurso | Página | Ações (POST via `?action=`) | Auth |
 |---|---|---|---|
-| Login | `admin/login.php` | `login` (valida senha) | Nenhuma — ponto de entrada |
+| Login | `admin/login.php` | `login` (valida senha → envia código 2FA por e-mail) | Nenhuma — ponto de entrada |
+| 2FA | `admin/verificar.php` | `verificar` (confere código), `reenviar` (≥ 60 s) | Sessão "pendente 2FA" + CSRF |
 | Logout | `admin/logout.php` | `logout` | Sessão |
 | Serviços | `admin/servicos.php` | `criar`, `editar`, `ativar`, `desativar` | Sessão + CSRF |
 | Profissionais | `admin/profissionais.php` | `criar`, `editar`, `ativar`, `desativar` | Sessão + CSRF |

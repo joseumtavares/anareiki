@@ -51,9 +51,9 @@ JavaScript:
 ## 3. Nomeação de arquivos
 
 - páginas em português, minúsculas: `index.php`, `agendar.php`, `servicos.php`;
-- includes por responsabilidade: `db.php`, `auth.php`, `csrf.php`, `slots.php`, `repositories.php`;
+- includes por responsabilidade: `db.php`, `auth.php`, `csrf.php`, `mailer.php`, `slots.php`, `repositories.php`;
 - estáticos em `static/` (`style.css`, `app.js`, `admin.js`, `img/`);
-- SQL em `sql/schema.sql`.
+- SQL em `sql/migrations/NNN_descricao.sql` (ver §10.1).
 
 Estrutura de pastas completa em `ARCHITECTURE.md` §5.
 
@@ -62,7 +62,8 @@ Estrutura de pastas completa em `ARCHITECTURE.md` §5.
 - consultas: `listarServicosAtivos()`, `buscarProfissional($id)`;
 - gravação: `criarAgendamento($dados)`, `atualizarStatusAgendamento($id, $status)`;
 - regras: `gerarHorariosLivres(...)`, `horarioColide(...)`;
-- auth: `login()`, `logout()`, `requireAdmin()`, `csrfToken()`, `csrfValido()`.
+- auth: `login()`, `logout()`, `requireAdmin()`, `csrfToken()`, `csrfValido()`, `enviarCodigo2fa()`, `validarCodigo2fa()`;
+- ids: `gerarUuid()` (v7) — todo INSERT recebe o id gerado no PHP.
 
 ## 5. Organização de pastas
 
@@ -117,8 +118,21 @@ Formato: `tipo: descrição curta` — tipos: `docs`, `feat`, `fix`, `style`, `r
 - validar uploads (tipo, tamanho, extensão) se/quando houver upload de foto de profissional;
 - rate limit por IP em `api/slots.php` e no POST de agendamento;
 - **não logar** telefone, e-mail ou observação de cliente; em erro, mensagem genérica ao usuário e `error_log` sem dados sensíveis;
-- proteger `/admin/**` com `requireAdmin()`;
+- proteger `/admin/**` com `requireAdmin()` — que só libera sessão com **2FA concluído**;
+- **2FA por e-mail** obrigatório no login admin: código de 6 dígitos com `random_int`, gravar **só o hash**, validade 10 min, máx. 5 tentativas, uso único, reenvio ≥ 60 s; nenhum caminho no código para pular o 2FA; nunca logar o código;
+- credenciais SMTP (e-mail + senha da caixa dedicada) só em `config.php`, com o mesmo tratamento das credenciais MySQL;
+- **sem RLS no banco** (MySQL não tem): toda leitura/escrita passa por `includes/repositories.php`; página nunca executa SQL direto;
+- ids são UUID v7 — validar formato de UUID em toda entrada de id (`$_GET`/`$_POST`) antes de consultar;
 - índice único `(profissional_id, data, hora_inicio)` como rede de segurança contra overbooking.
+
+## 10.1. Migrações de banco (obrigatório)
+
+- **toda** alteração de banco (tabela, coluna, índice, constraint, dado de seed) é entregue como **nova** migração em `sql/migrations/`, numerada em sequência: `002_adiciona_x.sql`, `003_…`;
+- **nunca editar** uma migração já aplicada em qualquer ambiente — corrigir com uma nova;
+- a primeira instrução de toda migração (a partir da 002) é `INSERT INTO migracoes (versao) VALUES ('NNN_descricao');` — reaplicar falha nessa linha antes de alterar qualquer tabela;
+- aplicar em ordem numérica: local via `mysql … -e "source sql/migrations/NNN_….sql"`; Hostinger via phpMyAdmin → Importar;
+- conferir o que já foi aplicado com `SELECT * FROM migracoes ORDER BY versao;`;
+- MySQL não faz DDL em transação: se uma migração falhar no meio, corrigir manualmente o estado e registrar o ocorrido na entrega.
 
 ## 11. Gates de qualidade obrigatórios
 
@@ -139,7 +153,7 @@ Regras:
 - para mudanças sem código, rodar só os gates afetados e declarar os demais como não aplicáveis;
 - falha de ambiente não é sucesso: registrar o bloqueio e como reproduzi-lo.
 
-> `ponytail:` sem passo de build no deploy (Hostinger serve os arquivos direto). Os gates rodam **localmente** antes do upload. Ferramentas PHP entram via Composer só como `require-dev`; não vão para o servidor.
+> `ponytail:` sem passo de build no deploy (Hostinger serve os arquivos direto). Os gates rodam **localmente** antes do upload. Ferramentas de qualidade entram via Composer como `require-dev`; a **única dependência de produção é o PHPMailer** (2FA) — no deploy, subir `vendor/` gerado com `composer install --no-dev`.
 
 ## 12. O que nunca deve ser feito
 
@@ -157,6 +171,7 @@ Regras:
 - A alteração está dentro do escopo pedido?
 - Algum documento (`ARCHITECTURE`/`API`/`DESIGN-SYSTEM`/`PLANO_MESTRE`) precisa ser atualizado?
 - O visual aprovado foi preservado?
+- Houve mudança no banco? Ela está numa **nova** migração em `sql/migrations/`, sem editar migração já aplicada?
 - Toda query usa prepared statements?
 - Toda entrada foi validada no servidor?
 - CSRF validado nos POSTs?
