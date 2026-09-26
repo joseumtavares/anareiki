@@ -1,0 +1,242 @@
+# Arquitetura — Reiki Ana
+
+Status: arquitetura-alvo da migração para PHP + MySQL (fundação ainda não implementada)
+Última revisão: 2026-09-25
+
+> **Governança:** o status de execução de cada fase (concluída/parcial/bloqueada) é controlado em `PLANO_MESTRE_ANAREIKI.md`. Este documento descreve a arquitetura técnica; não deve ser usado para acompanhar andamento de fase.
+
+---
+
+## 1. Visão geral
+
+O site sai de um protótipo estático (Hono/Cloudflare) para uma **aplicação PHP 8 + MySQL** hospedada no plano compartilhado da Hostinger. O padrão é um **monólito PHP renderizado no servidor**: sem SPA, sem build de framework, sem processo Node persistente. A interatividade do calendário de agendamento usa um único endpoint JSON consumido por `fetch`.
+
+Condução por fases (detalhe em `PLANO_MESTRE_ANAREIKI.md` §3):
+
+1. banco;
+2. fundação PHP (config, PDO, auth, CSRF);
+3. site público dinâmico;
+4. motor de agendamento;
+5. painel admin (Bootstrap);
+6. imagens locais;
+7. deploy Hostinger;
+8. limpeza da stack antiga.
+
+---
+
+## 2. Estado atual do repositório
+
+Hoje o repositório contém o protótipo estático empacotado em Hono/Cloudflare:
+
+```text
+Anareiki/
+├── src/index.tsx        # legado — HTML da home como string Hono
+├── src/renderer.tsx     # legado
+├── public/static/style.css   # identidade visual (será preservada)
+├── public/static/app.js      # interações de UI (será preservada)
+├── public/favicon.svg
+├── wrangler.jsonc · vite.config.ts · ecosystem.config.cjs   # legado — remover na Fase 8
+└── docs/
+```
+
+Ainda **não existem**: backend PHP, banco, autenticação, CRUD ou regras de negócio. Serão criados por fase, com aprovação.
+
+---
+
+## 3. Arquitetura-alvo
+
+```text
+Internet
+   ↓  HTTPS (SSL grátis Hostinger)
+Apache (Hostinger compartilhado) + PHP 8
+   ↓
+┌───────────────────────────────┬───────────────────────────────┐
+│ Site público                  │ Área administrativa (/admin)  │
+│ Home (serviços/profissionais) │ Login (sessão + CSRF)         │
+│ Agendar (calendário + form)   │ Serviços (CRUD)               │
+│ Contato / WhatsApp            │ Profissionais (CRUD)          │
+│                               │ Disponibilidade (CRUD)        │
+│                               │ Agendamentos (status)         │
+└───────────────────────────────┴───────────────────────────────┘
+   ↓
+Camada de acesso a dados (includes/repositories)
+   ↓
+PDO (prepared statements)
+   ↓
+MySQL
+```
+
+Regra de ouro: **componente visual não contém regra de negócio**. Consultas e regras ficam em `includes/`, nunca embutidas no HTML das páginas.
+
+---
+
+## 4. Modelo de dados (MySQL)
+
+```sql
+usuarios          -- login administrativo
+  id, nome, email (unique), senha_hash, criado_em
+
+profissionais
+  id, nome, especialidade, bio, foto_url, ativo (bool), criado_em
+
+servicos
+  id, nome, descricao, duracao_min (int), preco (decimal), categoria,
+  ativo (bool), ordem (int)
+
+profissional_servico          -- N:N: quais serviços cada profissional faz
+  profissional_id, servico_id  -- PK composta
+
+disponibilidade               -- recorrente por dia da semana
+  id, profissional_id, dia_semana (0-6), hora_inicio (time), hora_fim (time)
+
+agendamentos
+  id, servico_id, profissional_id,
+  cliente_nome, cliente_telefone, cliente_email (nullable),
+  data (date), hora_inicio (time), hora_fim (time),
+  status ENUM('pendente','confirmado','cancelado','concluido') default 'pendente',
+  observacao (nullable), criado_em
+```
+
+Integridade e proteção contra overbooking:
+
+- FKs: `agendamentos.servico_id → servicos.id`, `agendamentos.profissional_id → profissionais.id`; `disponibilidade.profissional_id → profissionais.id`.
+- **Índice único** `(profissional_id, data, hora_inicio)` em `agendamentos` — rede de segurança contra corrida, além da validação em `slots.php`.
+- `ON DELETE`: preferir desativar (`ativo=0`) a apagar; não apagar profissional/serviço com agendamentos futuros (validar no admin).
+
+> `ponytail:` disponibilidade recorrente por dia da semana é o mínimo que cobre o caso. Tabela `bloqueios(data, profissional_id)` para feriados/folgas entra só quando aprovada (fora do escopo atual — ver Plano Mestre §2). `profissional_servico` pode ser removida se houver só uma profissional.
+
+---
+
+## 5. Organização de pastas alvo (`public_html/`)
+
+```text
+public_html/
+├── index.php                # home — identidade visual atual, dados do banco
+├── agendar.php              # fluxo de agendamento (form + calendário)
+├── config.php               # credenciais do banco — protegido por .htaccess
+├── .htaccess                # nega acesso a config/includes; força HTTPS
+├── includes/
+│   ├── db.php               # conexão PDO única
+│   ├── auth.php             # sessão, login/logout, CSRF, require_admin()
+│   ├── csrf.php             # geração/validação de token
+│   ├── slots.php            # geração de horários e validação de conflito
+│   ├── repositories.php     # consultas (serviços, profissionais, agendamentos)
+│   └── layout/header.php · footer.php
+├── api/
+│   └── slots.php            # JSON: horários livres p/ serviço+profissional+data
+├── admin/
+│   ├── index.php            # dashboard (próximos agendamentos)
+│   ├── login.php · logout.php
+│   ├── servicos.php
+│   ├── profissionais.php
+│   ├── disponibilidade.php
+│   └── agendamentos.php
+├── static/
+│   ├── style.css            # identidade visual atual (preservada)
+│   ├── app.js               # interações públicas
+│   ├── admin.js             # interações do painel (Bootstrap)
+│   └── img/                 # imagens baixadas do genspark (Fase 6)
+├── favicon.svg
+└── sql/
+    └── schema.sql           # DDL + seed
+```
+
+Convenção: código de acesso a dados vive em `includes/`; páginas (`*.php`) só orquestram e renderizam. `config.php` e `includes/` nunca são servidos diretamente (bloqueio no `.htaccess`).
+
+---
+
+## 6. Fundação PHP (Fase 2)
+
+- **`db.php`**: instancia um único `PDO` com `ERRMODE_EXCEPTION`, `charset=utf8mb4`, `PDO::ATTR_EMULATE_PREPARES=false`.
+- **`auth.php`**: `session_start()` com cookie `HttpOnly`, `Secure`, `SameSite=Lax`; `login()` usa `password_verify`; `require_admin()` redireciona para `login.php` se não houver sessão.
+- **`csrf.php`**: token por sessão, validado em todo POST (público e admin).
+- Nunca acessar `$_POST`/`$_GET` sem validar; nunca concatenar SQL — sempre prepared statements. Ver `RULES.md` §10.
+
+---
+
+## 7. Fluxo de agendamento (Fase 4)
+
+```text
+Cliente escolhe serviço
+   ↓ (define duracao_min)
+escolhe profissional que faz o serviço  (profissional_servico)
+   ↓
+escolhe data → GET api/slots.php?servico=&profissional=&data=
+   ↓
+slots.php:
+   1. lê disponibilidade do profissional para aquele dia_semana
+   2. gera horários em passos de duracao_min dentro das faixas
+   3. remove horários que colidem com agendamentos existentes na data
+   ↓ devolve JSON de horários livres
+cliente escolhe horário + preenche nome/telefone
+   ↓ POST agendar.php (com CSRF)
+agendar.php revalida no servidor (slot ainda livre e dentro da faixa)
+   ↓
+grava agendamento status='pendente'  (índice único evita corrida)
+   ↓
+admin confirma no painel (status='confirmado')
+```
+
+> `ponytail:` geração de slots é O(n) por dia (varredura ingênua) — suficiente para a agenda de uma terapeuta. A lógica de `slots.php` (geração + detecção de conflito) é a única não-trivial do projeto e **tem teste PHPUnit obrigatório** (ver `RULES.md` §11). Otimizar só se a agenda crescer muito.
+
+---
+
+## 8. Fluxo de autenticação admin (Fase 2/5)
+
+```text
+Acessa /admin/*
+   ↓
+require_admin() verifica sessão
+   ↓ sem sessão → redireciona /admin/login.php
+login.php: valida CSRF → password_verify → cria sessão → regenera id de sessão
+   ↓
+libera o painel (papel único: admin)
+```
+
+Só existe o papel `admin`. RBAC com múltiplos papéis está fora do escopo atual (Plano Mestre §2).
+
+---
+
+## 9. Fluxo de dados público vs. privado
+
+```text
+Site público  → só dados públicos (serviços ativos, profissionais ativos, horários livres)
+Admin         → dados públicos + dados de clientes (nome/telefone dos agendamentos)
+```
+
+Telefone e e-mail de cliente são dados pessoais: nunca exibidos em página pública, nunca em URL/query, nunca logados. Ver `RULES.md` §10.
+
+---
+
+## 10. Como adicionar uma nova página
+
+1. confirmar que está no escopo aprovado (Plano Mestre);
+2. definir objetivo e CTA principal;
+3. reutilizar `header.php`/`footer.php` e tokens do `DESIGN-SYSTEM.md`;
+4. isolar qualquer consulta em `includes/`;
+5. verificar título único + meta description (SEO, `RULES.md` §9);
+6. documentar em `API.md` se criar endpoint.
+
+---
+
+## 11. Como adicionar uma nova funcionalidade
+
+1. validar com o Jose se há regra de negócio nova;
+2. verificar impacto em banco/segurança;
+3. seguir o fluxo de aprovação em duas camadas (`PLANO_MESTRE_ANAREIKI.md` §4);
+4. atualizar `API.md`/`DESIGN-SYSTEM.md`/`RULES.md` conforme o caso;
+5. implementar com o menor acoplamento possível;
+6. revisar acessibilidade, responsividade e segurança.
+
+---
+
+## 12. Deploy (Fase 7 — Hostinger compartilhado)
+
+1. hPanel → criar banco MySQL + usuário; anotar credenciais.
+2. hPanel → Bancos → phpMyAdmin → importar `sql/schema.sql`.
+3. Subir o conteúdo de `public_html/` via Gerenciador de Arquivos ou FTP para a raiz `public_html`.
+4. Editar `config.php` no servidor com as credenciais (não versionar).
+5. hPanel → SSL → ativar certificado grátis; forçar HTTPS no `.htaccess`.
+6. Testar: home, agendamento ponta a ponta, login admin, CRUD.
+
+Sem passo de build: são arquivos PHP/CSS/JS servidos diretamente. O ESLint e os testes rodam localmente antes do upload (ver `RULES.md` §11), não no servidor.
