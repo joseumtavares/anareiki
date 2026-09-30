@@ -112,6 +112,17 @@ Iniciar a Fase 3 na worktree `fase-3-site-dinamico`, partindo de `main` apos a i
 - **Verificação esperada:** teste focado e gates PHP (`composer.bat test`, `composer.bat cs`, `composer.bat stan`, `php -l` nos arquivos alterados); registrar os resultados no handoff ao concluir.
 - **Git:** autorização de commit/merge/push foi específica à entrega da Task 2. Obter aprovação explícita para operações Git da Task 3 antes de executá-las; Jose conduz esse fluxo.
 
+## Andamento da Task 4 - 2026-09-30
+
+- **Workspace/branch:** `.worktrees/fase-3-site-dinamico`, `fase-3-site-dinamico`.
+- **Concluído:** os seis CSS e `app.js` foram copiados de `public/static/` para `public_html/static/`; as origens e `admin-auth.js` foram preservados. SHA-256 confirmou igualdade byte a byte nos sete arquivos.
+- **Verificações:** `npm.cmd run check:lines` passou (todos os arquivos até 350 linhas); `npm.cmd run lint` passou sem erros nem avisos. `http://localhost:8080/` respondeu HTTP 200, mas cada `/static/<arquivo>` respondeu 404.
+- **Bloqueio da validação visual:** o Apache ativo está servindo outro `DocumentRoot`, não a worktree `fase-3-site-dinamico`; não havia navegador disponível nesta sessão para inspeção desktop/mobile. Nenhuma validação visual ou de estados vazios/erro foi alegada.
+- **Arquivos alterados:** as sete cópias em `public_html/static/`, este handoff e o checklist do plano. Sem alteração de lógica, banco ou conteúdo público.
+- **Skills usadas:** `using-superpowers`, `using-agent-skills`, `incremental-implementation`, `git-workflow-and-versioning` e `documentation-and-adrs`.
+- **Autorização Git:** Jose autorizou commit, merge e push deste andamento em 2026-09-30.
+- **Próxima ação:** apontar o Apache local para `C:\Users\Jose Tavares\anareiki\.worktrees\fase-3-site-dinamico\public_html` (ou iniciar ambiente local equivalente com esse document root) e concluir conferência visual desktop/mobile, arquivos carregados, campos opcionais e estados vazio/erro. Em seguida, prosseguir para Task 5.
+
 ## Modelo para o proximo encerramento
 
 1. Data, branch e fase.

@@ -1,0 +1,209 @@
+/* ---------- GALERIA ---------- */
+.galeria-section {
+  padding: 100px 0;
+  background: var(--rose-pale);
+}
+
+.galeria-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  gap: 16px;
+}
+
+.galeria-item {
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+
+.galeria-item img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.galeria-item.tall img  { height: 380px; }
+.galeria-item.wide      { grid-column: span 2; }
+.galeria-item.wide img  { height: 280px; }
+
+.galeria-item:hover img { transform: scale(1.06); }
+
+.galeria-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(45,27,61,0.8) 0%, transparent 60%);
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.galeria-item:hover .galeria-overlay { opacity: 1; }
+
+.galeria-overlay span {
+  color: var(--white);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* ---------- CONTATO ---------- */
+.contato-section {
+  padding: 100px 0;
+  background: var(--white);
+}
+
+.contato-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.contato-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px;
+  background: var(--rose-pale);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  border: 1px solid rgba(232,164,192,0.3);
+  transition: var(--transition);
+}
+
+.contato-card:hover {
+  border-color: var(--purple-light);
+  transform: translateX(4px);
+}
+
+.contato-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  color: var(--white);
+  flex-shrink: 0;
+}
+
+.contato-icon.wpp   { background: linear-gradient(135deg, #25d366, #128c7e); }
+.contato-icon.insta { background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+
+.contato-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.contato-detail strong {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.contato-detail a {
+  font-size: 1rem;
+  color: var(--dark);
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.contato-detail a:hover { color: var(--purple); }
+
+.contato-msgs h4 {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  margin-top: 8px;
+}
+
+.msg-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--rose-pale);
+  border: 1px solid rgba(232,164,192,0.4);
+  color: var(--text);
+  padding: 11px 16px;
+  border-radius: 12px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  transition: var(--transition);
+}
+
+.msg-chip i { color: #25d366; font-size: 1rem; }
+
+.msg-chip:hover {
+  background: var(--purple);
+  color: var(--white);
+  border-color: var(--purple);
+  transform: translateX(4px);
+}
+
+.msg-chip:hover i { color: var(--white); }
+
+.contato-hero-card {
+  border-radius: 24px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: var(--shadow-lg);
+}
+
+.contato-hero-card img {
+  width: 100%;
+  height: 480px;
+  object-fit: cover;
+}
+
+.contato-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(90,50,112,0.9) 0%, rgba(90,50,112,0.3) 50%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 32px;
+  gap: 16px;
+}
+
+.script-light {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.8rem;
+  color: var(--white);
+  text-align: center;
+}
+
+.btn-wpp-big {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #25d366;
+  color: var(--white);
+  padding: 14px 32px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  transition: var(--transition);
+}
+
+.btn-wpp-big:hover {
+  background: #128c7e;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(37,211,102,0.4);
+  color: var(--white);
+}

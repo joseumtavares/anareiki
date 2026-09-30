@@ -64,10 +64,12 @@
 
 **Arquivos:** copiar `style-01-foundation.css`, `style-02-hero-about.css` e `style-03-services-sessions.css` de `public/static/` para `public_html/static/`; copiar `style-04-packages-hours.css`, `style-05-gallery-contact.css`, `style-06-footer-responsive.css` e `app.js` para o mesmo destino.
 
-- [ ] Copiar os ativos sem editar/remover as origens e sem substituir `public_html/static/admin-auth.js`.
-- [ ] Confirmar que os nomes e conteúdos copiados correspondem às origens.
-- [ ] Rodar `npm run check:lines` e ESLint se houver ajuste em JavaScript.
+- [x] Copiar os ativos sem editar/remover as origens e sem substituir `public_html/static/admin-auth.js`.
+- [x] Confirmar que os nomes e conteúdos copiados correspondem às origens (SHA-256 idêntico nos sete arquivos).
+- [x] Rodar `npm run check:lines` (passou) e ESLint (passou; `app.js` foi copiado sem ajustes).
 - [ ] Conferir manualmente no Apache local desktop/mobile, conteúdo carregado, campos opcionais e estados vazio/erro; registrar bloqueios de configuração local.
+
+**Andamento em 2026-09-30:** o Apache em `http://localhost:8080/` respondeu HTTP 200, mas os sete caminhos `/static/...` retornaram 404. O servidor está apontando para outro `DocumentRoot`, não para esta worktree. Não havia navegador disponível nesta sessão, então a conferência visual desktop/mobile e dos estados dinâmicos permanece pendente.
 
 ### Task 5: Documentação e encerramento da etapa
 
