@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<ruleset name="anareiki">
+    <description>PSR-12 para o código PHP do projeto (RULES.md §11).</description>
+    <arg name="extensions" value="php"/>
+    <arg name="colors"/>
+    <arg value="sp"/>
+
+    <file>public_html</file>
+    <file>bin</file>
+    <file>tests</file>
+
+    <exclude-pattern>public_html/vendor/*</exclude-pattern>
+    <exclude-pattern>public_html/config.php</exclude-pattern>
+
+    <rule ref="PSR12"/>
+
+    <!-- Páginas .php misturam HTML e PHP por desenho (monólito renderizado no servidor). -->
+    <rule ref="PSR1.Files.SideEffects">
+        <exclude-pattern>public_html/admin/*</exclude-pattern>
+        <exclude-pattern>bin/*</exclude-pattern>
+        <exclude-pattern>public_html/includes/*</exclude-pattern>
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+    <!-- Testes PHPUnit permanecem no escopo global para acessar as funções legadas. -->
+    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+    <!-- Nomes de teste descritivos em português com sublinhado. -->
+    <rule ref="PSR1.Methods.CamelCapsMethodName">
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+</ruleset>

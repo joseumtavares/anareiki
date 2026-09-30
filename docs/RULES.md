@@ -24,6 +24,13 @@ Nenhuma implementação estrutural (schema, endpoint, regra de negócio, compone
 
 Detalhe completo em `PLANO_MESTRE_ANAREIKI.md` §4.
 
+## 1.2. Skills e handoff obrigatório
+
+- Cada tarefa deve usar a skill correspondente à fase do trabalho.
+- A skill escolhida e o motivo de uso devem ser registrados no handoff da sessão.
+- Ao encerrar qualquer sessão, atualizar `docs/HANDOFF.md` com estado, arquivos, decisões, verificações, bloqueios e próximo passo.
+- Não iniciar a próxima etapa do Plano Mestre enquanto o handoff anterior estiver ausente ou incompleto.
+
 ## 2. Convenções de código
 
 Geral:
@@ -51,8 +58,8 @@ JavaScript:
 ## 3. Nomeação de arquivos
 
 - páginas em português, minúsculas: `index.php`, `agendar.php`, `servicos.php`;
-- includes por responsabilidade: `db.php`, `auth.php`, `csrf.php`, `mailer.php`, `slots.php`, `repositories.php`;
-- estáticos em `static/` (`style.css`, `app.js`, `admin.js`, `img/`);
+- includes por responsabilidade: `db.php`, `auth.php`, `csrf.php`, `mailer.php`, `limites.php`, `slots.php`, `repositories.php`;
+- estáticos em `static/` (`style-01-foundation.css` through `style-06-footer-responsive.css`, `app.js`, `admin.js`, `img/`);
 - SQL em `sql/migrations/NNN_descricao.sql` (ver §10.1).
 
 Estrutura de pastas completa em `ARCHITECTURE.md` §5.
@@ -116,10 +123,10 @@ Formato: `tipo: descrição curta` — tipos: `docs`, `feat`, `fix`, `style`, `r
 - `.htaccess`: negar acesso a `config.php` e `includes/`; forçar HTTPS;
 - validar e sanear toda entrada; `SELECT` explícito de colunas em consulta pública (nunca expor dados de cliente);
 - validar uploads (tipo, tamanho, extensão) se/quando houver upload de foto de profissional;
-- rate limit por IP em `api/slots.php` e no POST de agendamento;
+- rate limit (tabela `limites_taxa`, `includes/limites.php` — nunca só na sessão) por IP em `api/slots.php` e no POST de agendamento; no login admin por IP e por e-mail (5 falhas/15 min) e na verificação 2FA por admin (10 falhas/15 min);
 - **não logar** telefone, e-mail ou observação de cliente; em erro, mensagem genérica ao usuário e `error_log` sem dados sensíveis;
 - proteger `/admin/**` com `requireAdmin()` — que só libera sessão com **2FA concluído**;
-- **2FA por e-mail** obrigatório no login admin: código de 6 dígitos com `random_int`, gravar **só o hash**, validade 10 min, máx. 5 tentativas, uso único, reenvio ≥ 60 s; nenhum caminho no código para pular o 2FA; nunca logar o código;
+- **2FA por e-mail** obrigatório no login admin: código de 6 dígitos com `random_int`, gravar **só o hash**, validade 60 s, máx. 5 tentativas, uso único, reenvio ≥ 60 s; nenhum caminho no código para pular o 2FA; nunca logar o código;
 - credenciais SMTP (e-mail + senha da caixa dedicada) só em `config.php`, com o mesmo tratamento das credenciais MySQL;
 - **sem RLS no banco** (MySQL não tem): toda leitura/escrita passa por `includes/repositories.php`; página nunca executa SQL direto;
 - ids são UUID v7 — validar formato de UUID em toda entrada de id (`$_GET`/`$_POST`) antes de consultar;
@@ -140,10 +147,13 @@ Toda alteração de código deve passar, antes de revisão, pelos comandos aplic
 
 | Camada | Ferramenta | Comando |
 |---|---|---|
-| JavaScript (`static/*.js`) | **ESLint** | `npx eslint static/` |
-| PHP — estilo | **PHP_CodeSniffer** (PSR-12) | `vendor/bin/phpcs` |
-| PHP — análise estática | **PHPStan** | `vendor/bin/phpstan analyse` |
-| PHP — testes | **PHPUnit** | `vendor/bin/phpunit` |
+| JavaScript/TypeScript | **ESLint** | `npm run lint` |
+| Linhas por arquivo | Verificador de fonte | `npm run check:lines` (m?ximo 350 linhas) |
+| PHP — estilo | **PHP_CodeSniffer** (PSR-12) | `composer cs` |
+| PHP — análise estática | **PHPStan** | `composer stan` |
+| PHP — testes | **PHPUnit** | `composer test` |
+
+(Os scripts do Composer chamam os binários de `public_html/vendor/bin/`; configuração em `phpcs.xml`, `phpstan.neon` e `phpunit.xml` na raiz.)
 
 Regras:
 

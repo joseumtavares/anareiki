@@ -4,6 +4,7 @@ dist/
 # dev
 .yarn/
 !.yarn/releases
+.worktrees/
 .vscode/*
 !.vscode/launch.json
 !.vscode/*.code-snippets
@@ -28,6 +29,13 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+
+# php — segredos e dependências nunca versionados (RULES §10)
+/config.php
+public_html/config.php
+public_html/Config.php
+public_html/vendor/
+.phpunit.cache/
 
 # misc
 .DS_Store

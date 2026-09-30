@@ -1,0 +1,24 @@
+{
+    "name": "reikiana/site",
+    "description": "Site e painel da Reiki Ana — PHP 8 + MySQL (Hostinger)",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.2",
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5",
+        "phpstan/phpstan": "^2.1",
+        "squizlabs/php_codesniffer": "^3.11"
+    },
+    "config": {
+        "vendor-dir": "public_html/vendor",
+        "sort-packages": true
+    },
+    "scripts": {
+        "test": "phpunit",
+        "stan": "phpstan analyse --memory-limit=512M",
+        "cs": "phpcs"
+    }
+}

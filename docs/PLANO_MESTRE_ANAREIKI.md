@@ -79,7 +79,7 @@ Cada fase só inicia após a anterior estar concluída, testada e aprovada (flux
 | Fase | Entrega | Depende de | Doc de referência |
 |---|---|---|---|
 | **1. Banco** | `sql/migrations/001_schema_inicial.sql` + tabela `migracoes` (UUID v7, `administradores`, `codigos_2fa`) + seed com serviços/profissional atuais | — | `ARCHITECTURE.md` §4 |
-| **2. Fundação PHP** | conexão PDO, `config.php` protegido, sessão + login admin **com 2FA por e-mail (PHPMailer + SMTP Hostinger)**, CSRF, `.htaccess`, script local de criação do admin | 1 | `ARCHITECTURE.md` §6 e §8, `RULES.md` §10 |
+| **2. Fundação PHP** | conexão PDO, `config.php` protegido, sessão + login admin **com 2FA por e-mail (PHPMailer + SMTP Hostinger)**, CSRF, `.htaccess`, script local de criação do admin, migração `002_limites_taxa` (rate limit), testes PHPUnit do 2FA | 1 | `ARCHITECTURE.md` §6 e §8, `RULES.md` §10 |
 | **3. Site público dinâmico** | `index.php`: serviços e profissionais vindos do banco, visual intacto | 2 | `DESIGN-SYSTEM.md` |
 | **4. Motor + fluxo de agendamento** | `agendar.php` + `includes/slots.php` (cálculo/validação) + **teste PHPUnit**; grava `pendente` | 3 | `API.md` §2, `ARCHITECTURE.md` §7 |
 | **5. Painel admin (Bootstrap)** | CRUD serviços, profissionais, disponibilidade; lista de agendamentos com troca de status | 2 | `DESIGN-SYSTEM.md` §admin |
@@ -117,6 +117,12 @@ Jose conduz o fluxo Git. O agente sugere comandos e explica, mas **não executa 
 
 ---
 
+### 4.1. Encerramento e handoff entre sessoes
+
+Toda sessao de desenvolvimento deve terminar com `docs/HANDOFF.md` atualizado antes de iniciar outra etapa do Plano Mestre. O handoff registra o estado da fase, arquivos alterados, decisoes tomadas, skills utilizadas, verificacoes, bloqueios, riscos e o proximo passo autorizado.
+
+Uma nova etapa do Plano Mestre so pode comecar quando o handoff da etapa anterior estiver preenchido e as pendencias bloqueadoras estiverem explicitamente aceitas pelo Jose.
+
 ## 6. Documentos do projeto
 
 - `PLANO_MESTRE_ANAREIKI.md` — **este arquivo** (escopo, fases, governança).
@@ -124,5 +130,6 @@ Jose conduz o fluxo Git. O agente sugere comandos e explica, mas **não executa 
 - `API.md` — contrato dos endpoints públicos e ações administrativas.
 - `DESIGN-SYSTEM.md` — identidade visual, tokens, componentes.
 - `RULES.md` — regras de código, segurança, acessibilidade e gates de qualidade.
+- `HANDOFF.md` — estado de transição entre sessões, skills usadas, verificações e próximo passo autorizado.
 
-Manter os cinco **sincronizados**: toda decisão estrutural aprovada atualiza o documento correspondente na mesma entrega.
+Manter os seis **sincronizados**: toda decisão estrutural aprovada atualiza o documento correspondente na mesma entrega, e o `HANDOFF.md` é atualizado ao encerrar a sessão.

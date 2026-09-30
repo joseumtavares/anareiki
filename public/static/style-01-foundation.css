@@ -1,0 +1,262 @@
+/* ===================================
+   REIKI ANA — MASSOTERAPEUTA
+   Identidade Visual: Roxo, Rosa, Lilás
+   =================================== */
+
+/* ---------- RESET & BASE ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --purple:       #7B4F9E;
+  --purple-dark:  #5A3270;
+  --purple-light: #C9A8E0;
+  --rose:         #E8A4C0;
+  --rose-light:   #F5DDE8;
+  --rose-pale:    #FDF0F5;
+  --gold:         #C9A96E;
+  --green:        #6B7F5E;
+  --cream:        #FBF7F2;
+  --dark:         #2D1B3D;
+  --text:         #4A3555;
+  --text-light:   #7A6A87;
+  --white:        #FFFFFF;
+  --shadow:       0 8px 32px rgba(123,79,158,0.12);
+  --shadow-lg:    0 20px 60px rgba(123,79,158,0.18);
+  --radius:       16px;
+  --radius-sm:    10px;
+  --transition:   all 0.35s cubic-bezier(.4,0,.2,1);
+}
+
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  font-family: 'Lato', sans-serif;
+  color: var(--text);
+  background: var(--cream);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+a { text-decoration: none; color: inherit; }
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.script { font-family: 'Playfair Display', serif; font-style: italic; color: var(--purple); }
+.script-heading { font-family: 'Cormorant Garamond', serif; }
+.mt-2 { margin-top: 12px; }
+
+/* ---------- NAVBAR ---------- */
+#navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  background: rgba(253,240,245,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(201,168,224,0.3);
+  transition: var(--transition);
+}
+
+#navbar.scrolled {
+  background: rgba(253,240,245,0.98);
+  box-shadow: 0 2px 20px rgba(123,79,158,0.15);
+}
+
+.nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 24px;
+}
+
+.nav-logo {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.logo-script {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.5rem;
+  color: var(--purple);
+  font-weight: 400;
+}
+
+.logo-sub {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rose);
+  font-weight: 700;
+  margin-top: -2px;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-link {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 30px;
+  transition: var(--transition);
+}
+
+.nav-link:hover {
+  color: var(--purple);
+  background: rgba(123,79,158,0.08);
+}
+
+.btn-nav {
+  background: var(--purple);
+  color: var(--white) !important;
+  padding: 9px 20px !important;
+  border-radius: 30px;
+}
+
+.btn-nav:hover {
+  background: var(--purple-dark) !important;
+  color: var(--white) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(123,79,158,0.3);
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.nav-toggle span {
+  width: 24px;
+  height: 2px;
+  background: var(--purple);
+  border-radius: 2px;
+  transition: var(--transition);
+  display: block;
+}
+
+/* ---------- BUTTONS ---------- */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--purple);
+  color: var(--white);
+  padding: 13px 28px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.03em;
+  transition: var(--transition);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: var(--purple-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(123,79,158,0.35);
+  color: var(--white);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--white);
+  padding: 12px 28px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: 2px solid rgba(255,255,255,0.7);
+  transition: var(--transition);
+}
+
+.btn-ghost:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: var(--white);
+}
+
+.btn-small {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--rose-light);
+  color: var(--purple);
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  transition: var(--transition);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-small:hover {
+  background: var(--purple);
+  color: var(--white);
+  transform: translateY(-1px);
+}
+
+.full-width { width: 100%; justify-content: center; }
+
+/* ---------- SECTION COMMONS ---------- */
+.section-eyebrow {
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--rose);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 600;
+  color: var(--dark);
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.section-title.white { color: var(--white); }
+.section-title .script { color: var(--rose); }
+
+.section-desc {
+  color: var(--text-light);
+  font-size: 1rem;
+  max-width: 560px;
+}
+
+.section-desc.white { color: rgba(255,255,255,0.8); }
+
+.section-header {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.section-header .section-desc { margin: 0 auto; }
+.section-header.light .section-eyebrow { color: rgba(255,255,255,0.7); }

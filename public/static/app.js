@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
   revealEls.forEach(el => el.classList.add('reveal'));
 
   const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
+    entries.forEach((entry) => {
       if (entry.isIntersecting) {
         setTimeout(() => {
           entry.target.classList.add('visible');
@@ -106,20 +106,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const overlay = document.createElement('div');
       overlay.className = 'lightbox-overlay';
-      overlay.innerHTML = `
-        <div class="lightbox-inner">
-          <button class="lightbox-close" aria-label="Fechar">&times;</button>
-          <img src="${img.src}" alt="${img.alt}" />
-          <p class="lightbox-caption">${label ? label.textContent : ''}</p>
-        </div>
-      `;
+      const inner = document.createElement('div');
+      inner.className = 'lightbox-inner';
+      const closeButton = document.createElement('button');
+      closeButton.className = 'lightbox-close';
+      closeButton.type = 'button';
+      closeButton.setAttribute('aria-label', 'Fechar');
+      closeButton.textContent = '×';
+      const image = document.createElement('img');
+      image.src = img.src;
+      image.alt = img.alt;
+      const caption = document.createElement('p');
+      caption.className = 'lightbox-caption';
+      caption.textContent = label ? label.textContent : '';
+      inner.append(closeButton, image, caption);
+      overlay.append(inner);
       document.body.appendChild(overlay);
       document.body.style.overflow = 'hidden';
 
       requestAnimationFrame(() => overlay.classList.add('show'));
 
       overlay.addEventListener('click', (e) => {
-        if (e.target === overlay || e.target.classList.contains('lightbox-close')) {
+        if (e.target === overlay || e.target === closeButton) {
           overlay.classList.remove('show');
           setTimeout(() => {
             overlay.remove();
@@ -168,22 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
   `;
   document.head.appendChild(lbStyle);
 
-  // ---------- CONTADOR DE SERVIÇOS NA HERO ----------
-  // Pequena animação de números
-  function animateCount(el, target, duration = 1200) {
-    let start = 0;
-    const step = target / (duration / 16);
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= target) {
-        el.textContent = target;
-        clearInterval(timer);
-      } else {
-        el.textContent = Math.floor(start);
-      }
-    }, 16);
-  }
-
   // ---------- TOOLTIP NOS PREÇOS DA TABELA ----------
   document.querySelectorAll('.sessao-row').forEach(row => {
     row.addEventListener('mouseenter', () => {
@@ -201,7 +193,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---------- BOTÃO VOLTAR AO TOPO ----------
   const backTop = document.createElement('button');
   backTop.className = 'back-to-top';
-  backTop.innerHTML = '<i class="fas fa-chevron-up"></i>';
+  const backTopIcon = document.createElement('i');
+  backTopIcon.className = 'fas fa-chevron-up';
+  backTop.append(backTopIcon);
   backTop.setAttribute('aria-label', 'Voltar ao topo');
   document.body.appendChild(backTop);
 

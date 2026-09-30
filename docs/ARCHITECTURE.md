@@ -32,7 +32,7 @@ Hoje o repositório contém o protótipo estático empacotado em Hono/Cloudflare
 Anareiki/
 ├── src/index.tsx        # legado — HTML da home como string Hono
 ├── src/renderer.tsx     # legado
-├── public/static/style.css   # identidade visual (será preservada)
+├── public/static/style-01-foundation.css (tokens/base) + five CSS modules   # identidade visual (será preservada)
 ├── public/static/app.js      # interações de UI (será preservada)
 ├── public/favicon.svg
 ├── wrangler.jsonc · vite.config.ts · ecosystem.config.cjs   # legado — remover na Fase 8
@@ -82,6 +82,9 @@ codigos_2fa       -- 2FA por e-mail: só hash do código, uso único
   id, administrador_id (FK, ON DELETE CASCADE), codigo_hash,
   expira_em, tentativas, usado_em (nullable), criado_em
 
+limites_taxa      -- rate limit por chave em janela fixa (migração 002)
+  chave (PK natural, ex.: 'login:ip:…'), contador, janela_inicio
+
 profissionais
   id, nome, especialidade, bio, foto_url, ativo (bool), criado_em
 
@@ -119,19 +122,21 @@ Integridade e proteção contra overbooking:
 ## 5. Organização de pastas alvo (`public_html/`)
 
 ```text
+config.php                  # local secret file outside the public web root; Git-ignored
+
 public_html/
 ├── index.php                # home — identidade visual atual, dados do banco
 ├── agendar.php              # fluxo de agendamento (form + calendário)
-├── config.php               # credenciais do banco — protegido por .htaccess
 ├── .htaccess                # nega acesso a config/includes; força HTTPS
 ├── includes/
 │   ├── db.php               # conexão PDO única + gerarUuid() (v7)
 │   ├── auth.php             # sessão, login/logout, 2FA, require_admin()
 │   ├── mailer.php           # envio via PHPMailer + SMTP Hostinger
+│   ├── limites.php          # rate limit (tabela limites_taxa)
 │   ├── csrf.php             # geração/validação de token
 │   ├── slots.php            # geração de horários e validação de conflito
 │   ├── repositories.php     # consultas (serviços, profissionais, agendamentos)
-│   └── layout/header.php · footer.php
+│   └── layout/header.php · footer.php · admin.php (topo/rodapé Bootstrap do painel)
 ├── api/
 │   └── slots.php            # JSON: horários livres p/ serviço+profissional+data
 ├── admin/
@@ -142,7 +147,7 @@ public_html/
 │   ├── disponibilidade.php
 │   └── agendamentos.php
 ├── static/
-│   ├── style.css            # identidade visual atual (preservada)
+    - style-01-foundation.css through style-06-footer-responsive.css # modular styles, visual identity preserved
 │   ├── app.js               # interações públicas
 │   ├── admin.js             # interações do painel (Bootstrap)
 │   └── img/                 # imagens baixadas do genspark (Fase 6)
@@ -151,10 +156,17 @@ public_html/
 
 sql/                         # raiz do repositório — NÃO sobe para public_html
 └── migrations/              # aplicadas em ordem via phpMyAdmin/CLI
-    └── 001_schema_inicial.sql   # tabelas + seed + tabela migracoes
+    ├── 001_schema_inicial.sql   # tabelas + seed + tabela migracoes
+    └── 002_limites_taxa.sql     # rate limit do login/2FA (e slots na Fase 4)
+
+bin/criar-admin.php          # CLI local: cria admin / redefine senha — NÃO sobe
+tests/                       # PHPUnit — NÃO sobe
+composer.json · phpunit.xml · phpstan.neon · phpcs.xml   # vendor-dir = public_html/vendor
 ```
 
-Convenção: código de acesso a dados vive em `includes/`; páginas (`*.php`) só orquestram e renderizam. `config.php` e `includes/` nunca são servidos diretamente (bloqueio no `.htaccess`).
+Ambiente local: Apache do XAMPP em `http://localhost:8080` com `DocumentRoot` em `public_html/` (VirtualHost com `AllowOverride All` e `Require local`), para o `.htaccess` valer igual à Hostinger. O `.htaccess` não força HTTPS em `localhost`, e o cookie de sessão só recebe `Secure` quando a conexão é HTTPS.
+
+Convention: data access lives in `includes/`; `config.php` stays outside the document root and `.htaccess` blocks `includes/`.
 
 ---
 
@@ -206,7 +218,7 @@ require_admin() verifica sessão
 login.php: valida CSRF → password_verify
    ↓ senha ok → sessão "pendente 2FA" (ainda sem acesso ao painel)
 gera código de 6 dígitos (random_int) → grava só o hash em codigos_2fa
-   (validade 10 min, máx. 5 tentativas, uso único) → envia por e-mail
+   (validade 60 s, máx. 5 tentativas, uso único) → envia por e-mail
    ↓
 verificar.php: valida CSRF → confere hash, validade e tentativas
    ↓ ok → marca usado_em → regenera id de sessão → sessão admin completa

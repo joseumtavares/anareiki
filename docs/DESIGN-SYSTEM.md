@@ -1,6 +1,6 @@
 # Design System — Reiki Ana
 
-Status: design system inicial extraído do frontend atual (`public/static/style.css`)
+Status: design system inicial extraído do frontend atual (`public/static/style-01-foundation.css`)
 Última revisão: 2026-09-25
 
 > **Governança:** o status da fase de frontend está em `PLANO_MESTRE_ANAREIKI.md`. Modernizações visuais aqui descritas dependem de apresentação e aprovação do Jose antes da implementação. A identidade aprovada **deve ser preservada** na migração para PHP.
@@ -17,7 +17,7 @@ O site público mantém o CSS atual sem alteração de linguagem. O **painel adm
 
 ## 2. Cores
 
-Tokens reais definidos em `public/static/style.css` (`:root`):
+Tokens reais definidos em `public/static/style-01-foundation.css` (`:root`):
 
 | Token | Valor | Uso |
 |---|---|---|
@@ -185,6 +185,13 @@ Hoje via Font Awesome (CDN). Ícone decorativo usa `aria-hidden="true"`; ícone 
 - layout simples: sidebar + conteúdo; sem componentes pesados desnecessários;
 - reutilizar os padrões de input/tabela/estado desta doc;
 - o admin não precisa da mesma exuberância do site público — prioriza clareza e rapidez de uso.
+
+### Tela de autenticação
+
+- usar fundo em roxo profundo com detalhes radiais discretos em lilás/rosa;
+- manter conteúdo em cartão claro, com largura confortável e campos/botão bem destacados;
+- animações de entrada e hover devem ser curtas e respeitar `prefers-reduced-motion`;
+- preservar o fluxo de autenticação existente e os estados acessíveis de foco e mensagens.
 
 ---
 
