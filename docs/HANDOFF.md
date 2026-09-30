@@ -123,6 +123,15 @@ Iniciar a Fase 3 na worktree `fase-3-site-dinamico`, partindo de `main` apos a i
 - **Autorização Git:** Jose autorizou commit, merge e push deste andamento em 2026-09-30.
 - **Próxima ação:** apontar o Apache local para `C:\Users\Jose Tavares\anareiki\.worktrees\fase-3-site-dinamico\public_html` (ou iniciar ambiente local equivalente com esse document root) e concluir conferência visual desktop/mobile, arquivos carregados, campos opcionais e estados vazio/erro. Em seguida, prosseguir para Task 5.
 
+### Correção da faixa branca no menu mobile - 2026-09-30
+
+- **Causa:** a regra mobile mantinha `padding: 20px` no menu fechado, criando a faixa branca mesmo com `max-height: 0` e `overflow: hidden`.
+- **Correção:** em `public_html/static/style-06-footer-responsive.css`, o menu fechado usa `padding: 0 20px`; `.nav-links.open` restaura `padding: 20px`, e a transição inclui o padding. A cópia de origem `public/static/` não foi alterada.
+- **Regressão:** `tests/ResponsiveNavigationTest.php` falhou antes da correção no padding fechado e passou depois (1 teste, 5 asserções).
+- **Gates:** PHPUnit 29/29 (297 asserções), PHPCS 28/28, PHPStan sem erros, `npm run check:lines` e ESLint aprovados; `git diff --check` sem erros.
+- **Conferência visual:** os prints do usuário mostram a faixa apenas quando fechado e o painel esperado quando aberto. Em renderização headless própria, CSS em viewport 501 px (menu mobile) calculou `max-height: 0`, `padding: 0 20px` e altura do painel 0; em 768 px apareceu o botão mobile e em 800 px a navegação horizontal. Chrome headless limita a largura CSS mínima a 500 px, portanto 360, 375, 390, 412 e 430 px não puderam ser reproduzidos com precisão. Repetir no Chrome normal nas sete resoluções: 360x800, 390x844, 412x915, 375x667, 430x932, 768x1024 e 800x1280.
+- **Ambiente:** a página PHP foi servida localmente pela worktree, mas não há `config.php` nela; conteúdo do banco não foi validado nesta conferência. O servidor e o arquivo de inspeção temporário foram encerrados/removidos.
+
 ## Modelo para o proximo encerramento
 
 1. Data, branch e fase.

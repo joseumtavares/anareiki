@@ -71,6 +71,8 @@
 
 **Andamento em 2026-09-30:** o Apache em `http://localhost:8080/` respondeu HTTP 200, mas os sete caminhos `/static/...` retornaram 404. O servidor está apontando para outro `DocumentRoot`, não para esta worktree. Não havia navegador disponível nesta sessão, então a conferência visual desktop/mobile e dos estados dinâmicos permanece pendente.
 
+**Correção responsiva em 2026-09-30:** após a cópia, `public_html/static/style-06-footer-responsive.css` foi ajustado para remover o padding vertical do menu fechado; o estado `.open` restaura `padding: 20px`. `public/static/style-06-footer-responsive.css` permanece intacto. O teste de regressão falhou antes e passou depois. O Chrome headless deste ambiente limita viewports menores que 500 CSS px; a conferência final nas larguras exatas informadas pelo usuário ainda requer Chrome normal.
+
 ### Task 5: Documentação e encerramento da etapa
 
 **Arquivos:** atualizar `docs/ARCHITECTURE.md`; atualizar `docs/DESIGN-SYSTEM.md` somente se o estado sem foto exigir nova regra; atualizar `docs/HANDOFF.md` e `tasks/todo.md`.
