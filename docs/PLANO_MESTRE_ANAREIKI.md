@@ -119,9 +119,9 @@ Jose conduz o fluxo Git. O agente sugere comandos e explica, mas **não executa 
 
 ### 4.1. Encerramento e handoff entre sessoes
 
-Toda sessao de desenvolvimento deve terminar com `docs/HANDOFF.md` atualizado antes de iniciar outra etapa do Plano Mestre. O handoff registra o estado da fase, arquivos alterados, decisoes tomadas, skills utilizadas, verificacoes, bloqueios, riscos e o proximo passo autorizado.
+Toda sessao deve terminar com a documentacao afetada atualizada e `docs/HANDOFF.md` pronto para ser usado na abertura da proxima etapa. Alem do estado da fase, arquivos, decisoes, skills, verificacoes, bloqueios, riscos e autorizacao, o handoff registra branch/worktree, commit base, objetivo e escopo da proxima etapa, contexto que deve ser lido e a primeira acao prevista.
 
-Uma nova etapa do Plano Mestre so pode comecar quando o handoff da etapa anterior estiver preenchido e as pendencias bloqueadoras estiverem explicitamente aceitas pelo Jose.
+Ao abrir uma etapa, ler o handoff e este Plano Mestre antes de alterar codigo. Uma nova etapa so pode comecar quando o handoff estiver preenchido e as pendencias bloqueadoras estiverem explicitamente aceitas pelo Jose.
 
 ## 6. Documentos do projeto
 

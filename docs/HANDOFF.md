@@ -61,10 +61,32 @@ Iniciar a Fase 3 na worktree `fase-3-site-dinamico`, partindo de `main` apos a i
 - Jose confirmou o funcionamento da etapa e autorizou commit, merge em `main`, push e abertura da worktree da Fase 3.
 - Revisao tecnica independente: nenhum bloqueio de seguranca ou funcionalidade encontrado para merge.
 - Pontos aceitos e registrados: os testes cobrem as regras puras do OTP, mas nao simulam concorrencia nas escritas atomicas; a migracao 002 tem `SET NAMES` antes do registro em `migracoes`. Como ela ja foi aplicada localmente, nao editar o arquivo historico; preservar a regra nas proximas migracoes. Expandir cobertura de persistencia antes de novas mudancas nessa area.
-- A worktree da Fase 3 sera criada em `.worktrees/fase-3-site-dinamico`; `.worktrees/` esta ignorada pelo Git.
+- A worktree da Fase 3 foi criada em `.worktrees/fase-3-site-dinamico`, branch `fase-3-site-dinamico`, a partir do commit `1a2312d`; `.worktrees/` esta ignorada pelo Git.
 - Skills desta etapa de encerramento: `requesting-code-review`, `finishing-a-development-branch`, `using-git-worktrees`, `verification-before-completion` e `git-workflow-and-versioning`.
 - Pos-merge, o `core.autocrlf` do Windows converteu os PHPs para CRLF e fez PHPCS falhar. `.gitattributes` agora fixa LF para `*.php`; apos normalizar os arquivos locais, PHPCS voltou a passar (14 arquivos).
 
+## Handoff para abertura da Fase 3 — 2026-09-30
+
+- **Workspace:** `C:\Users\Jose Tavares\anareiki\.worktrees\fase-3-site-dinamico`
+- **Branch e base:** `fase-3-site-dinamico`, iniciada no `main` publicado em `1a2312d`.
+- **Objetivo autorizado:** entregar o site publico dinamico, buscando servicos e profissionais ativos do MySQL e preservando o visual aprovado.
+- **Escopo de referencia:** Fase 3 no `PLANO_MESTRE_ANAREIKI.md`; arquitetura em `ARCHITECTURE.md`; cores/componentes em `DESIGN-SYSTEM.md`; seguranca e gates em `RULES.md` e `API.md`.
+- **Estado inicial:** worktree criada limpa; `npm ci` e `composer install` concluidos; PHPUnit 18/18 (222 assertions), build, ESLint, limite de 350 linhas, PHPCS e PHPStan passaram na worktree. Esta atualizacao documental esta pendente de commit.
+- **Contexto herdado:** autenticacao, CSRF e OTP estao concluidos. Revisao registrou ausencia de testes concorrentes das escritas atomicas do OTP; cobrir antes de alterar essa persistencia. A migracao 002 ja foi aplicada e e imutavel; novas migracoes devem iniciar pelo registro em `migracoes`.
+- **Pendencias/riscos:** rotacionar senha SMTP antes do deploy da Fase 7. A verificacao visual automatizada do admin nao foi feita nesta sessao.
+- **Primeira acao:** inspecionar o site publico atual e os repositories/configuracao de banco; propor o desenho de leitura de servicos/profissionais e obter revisao/aprovacao antes da implementacao estrutural. Nao expandir a Fase 3 para agendamento (Fase 4) ou CRUD admin (Fase 5).
+- **Skill documental aplicada:** `documentation-and-adrs`, para tornar o handoff reutilizavel como contexto de inicio.
+
+## Abertura da Fase 3 — andamento em 2026-09-30
+
+- Jose aprovou a composição dinâmica de perfis dentro da seção “Sobre”, mantendo a imagem do ambiente, dicas e CTA compartilhados. Não gerar imagens de exemplo; profissionais sem foto ficam sem retrato até o envio das fotos reais pelo painel. Textos fictícios aparecem somente em testes.
+- Revisão técnica por par pediu explicitar campos opcionais, escaping HTML, URLs de imagem e desempate estável; a especificação registra esses controles.
+- Task 1 concluída nesta sessão em `fase-3-site-dinamico`: criados `public_html/includes/repositories.php`, `public_html/includes/public-view.php`, `tests/HomeRepositoryTest.php` e `tests/PublicViewTest.php`.
+- Verificações Task 1: testes focados 5/5, 26 asserções; suíte completa 23/23, 248 asserções; PHPCS e PHPStan passaram; `php -l` nos quatro arquivos passou. Nenhuma imagem exemplo criada. Jose autorizou commit, merge em `main` e push em 2026-09-30.
+- Checklist de segurança revisado: `docs/checklist_seguranca_agente_desenvolvimento.md`. Na Task 1, as consultas usam prepared statements e colunas explícitas, filtram registros ativos e não retornam campos internos; os helpers escapam texto HTML e usam allowlist para caminhos/URLs de imagem. Testes cobrem escaping, UTF-8 inválido, URLs inválidas, filtros, ordenação e exclusão de campos internos. Não foram identificadas correções de segurança pendentes no escopo implementado.
+- Fora do escopo/verificação desta Task 1: autenticação/autorização de painel, CSRF e escrita, rate limit de endpoints, upload real de imagens, configuração HTTP/CSP em execução e inspeção de tráfego/bundle no navegador. Avaliar cada controle quando a respectiva rota/fluxo for implementado; os filtros de dados públicos não substituem autorização em rotas administrativas futuras.
+- Plano: `docs/superpowers/plans/2026-09-30-site-publico-dinamico.md`; checklist: `tasks/todo.md`.
+- Próxima ação autorizada: Task 2 — shell e apresentação da home na mesma worktree.
 ## Modelo para o proximo encerramento
 
 1. Data, branch e fase.
