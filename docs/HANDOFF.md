@@ -63,6 +63,7 @@ Iniciar a Fase 3 na worktree `fase-3-site-dinamico`, partindo de `main` apos a i
 - Pontos aceitos e registrados: os testes cobrem as regras puras do OTP, mas nao simulam concorrencia nas escritas atomicas; a migracao 002 tem `SET NAMES` antes do registro em `migracoes`. Como ela ja foi aplicada localmente, nao editar o arquivo historico; preservar a regra nas proximas migracoes. Expandir cobertura de persistencia antes de novas mudancas nessa area.
 - A worktree da Fase 3 sera criada em `.worktrees/fase-3-site-dinamico`; `.worktrees/` esta ignorada pelo Git.
 - Skills desta etapa de encerramento: `requesting-code-review`, `finishing-a-development-branch`, `using-git-worktrees`, `verification-before-completion` e `git-workflow-and-versioning`.
+- Pos-merge, o `core.autocrlf` do Windows converteu os PHPs para CRLF e fez PHPCS falhar. `.gitattributes` agora fixa LF para `*.php`; apos normalizar os arquivos locais, PHPCS voltou a passar (14 arquivos).
 
 ## Modelo para o proximo encerramento
 
