@@ -1072,4 +1072,3 @@ Ao concluir a auditoria, o agente deve gerar um relatório contendo:
 - [ ] possíveis impactos;
 - [ ] pendências;
 - [ ] recomendações futuras.
-

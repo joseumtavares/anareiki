@@ -28,7 +28,9 @@ Detalhe completo em `PLANO_MESTRE_ANAREIKI.md` §4.
 
 - Cada tarefa deve usar a skill correspondente à fase do trabalho.
 - A skill escolhida e o motivo de uso devem ser registrados no handoff da sessão.
-- Ao encerrar qualquer sessão, atualizar `docs/HANDOFF.md` com estado, arquivos, decisões, verificações, bloqueios e próximo passo.
+- Ao finalizar qualquer etapa ou sessão, atualizar a documentação afetada e `docs/HANDOFF.md` antes de encerrar.
+- O handoff também prepara a abertura da próxima etapa: registrar fase, branch/worktree, commit base, objetivo e escopo autorizado, documentos de contexto, estado inicial, gates, decisões, pendências aceitas, riscos e primeira ação autorizada.
+- Na sessão seguinte, ler e validar o handoff e o Plano Mestre antes de alterar código. Se o handoff estiver ausente ou incompleto, completar a documentação primeiro.
 - Não iniciar a próxima etapa do Plano Mestre enquanto o handoff anterior estiver ausente ou incompleto.
 
 ## 2. Convenções de código
@@ -114,6 +116,9 @@ Formato: `tipo: descrição curta` — tipos: `docs`, `feat`, `fix`, `style`, `r
 - `robots.txt` e sitemap na Fase 7.
 
 ## 10. Segurança (obrigatória — stack PHP/MySQL)
+
+- Usar `docs/checklist_seguranca_agente_desenvolvimento.md` como roteiro de revisão em cada tarefa de segurança. Avaliar os controles aplicáveis ao escopo alterado, registrar evidências, itens não aplicáveis e pendências no handoff; não marcar controles de infraestrutura ou de funcionalidades futuras como verificados sem evidência.
+- Para alterações que recebem dados externos, autenticação, autorização, uploads, chamadas externas ou operações de escrita, revisar os testes negativos pertinentes do checklist e cobrir regressões automatizadamente.
 
 - **PDO com prepared statements** em toda query, sem exceção;
 - **`password_hash`/`password_verify`** para senha do admin; nunca senha em texto puro;
