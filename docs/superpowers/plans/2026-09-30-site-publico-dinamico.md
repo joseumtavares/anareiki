@@ -44,11 +44,11 @@
 
 **Arquivos:** criar `public_html/index.php`, `public_html/includes/layout/home/head.php`, `top.php`, `about.php` e `tests/HomePageTest.php`.
 
-- [ ] Escrever teste de renderização para título, navegação e seção “Sobre” preservados; a lista de profissionais fictícios deve ser escapada e campos nulos omitidos.
-- [ ] Confirmar que o teste falha antes de implementar.
-- [ ] Ligar a home aos repositories; manter imagem do ambiente, dicas e CTA compartilhados uma vez. Inserir a lista textual dinâmica de perfis na composição aprovada, sem foto inventada.
-- [ ] Confirmar que foto nula/vazia não emite `<img>` de profissional e que caminho fora de `/static/` é recusado.
-- [ ] Rodar o teste focado, `composer cs`, `composer stan` e `php -l` nos PHPs criados.
+- [x] Escrever teste de renderização para título, navegação e seção “Sobre” preservados; a lista de profissionais fictícios deve ser escapada e campos nulos omitidos.
+- [x] Confirmar que o teste falha antes de implementar.
+- [x] Ligar a home aos repositories; manter imagem do ambiente, dicas e CTA compartilhados uma vez. Inserir a lista textual dinâmica de perfis na composição aprovada, sem foto inventada.
+- [x] Confirmar que foto nula/vazia não emite `<img>` de profissional e que caminho fora de `/static/` é recusado.
+- [x] Rodar o teste focado, `composer cs`, `composer stan` e `php -l` nos PHPs criados.
 
 ### Task 3: Catálogo dinâmico e conteúdo complementar
 

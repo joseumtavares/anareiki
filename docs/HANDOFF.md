@@ -87,6 +87,16 @@ Iniciar a Fase 3 na worktree `fase-3-site-dinamico`, partindo de `main` apos a i
 - Fora do escopo/verificação desta Task 1: autenticação/autorização de painel, CSRF e escrita, rate limit de endpoints, upload real de imagens, configuração HTTP/CSP em execução e inspeção de tráfego/bundle no navegador. Avaliar cada controle quando a respectiva rota/fluxo for implementado; os filtros de dados públicos não substituem autorização em rotas administrativas futuras.
 - Plano: `docs/superpowers/plans/2026-09-30-site-publico-dinamico.md`; checklist: `tasks/todo.md`.
 - Próxima ação autorizada: Task 2 — shell e apresentação da home na mesma worktree.
+
+## Conclusão da Task 2 — 2026-09-30
+
+- Criados `public_html/index.php`, os partials `head.php`, `top.php` e `about.php` em `public_html/includes/layout/home/`, além de `tests/HomePageTest.php`.
+- A home consulta profissionais ativos pelo repository. A seção Sobre preserva imagem do ambiente, dicas e CTA uma vez; perfis dinâmicos escapam texto e só incluem foto aprovada pelo helper local `/static/`. Campos opcionais vazios são omitidos e listas vazias têm estado neutro.
+- Verificações: PHPUnit 25/25 (267 asserções), PHPCS 23 arquivos sem erros/avisos, PHPStan sem erros, `php -l` nos cinco arquivos novos e `git diff --check` sem erros. Os dois testes focados cobrem perfis e lista vazia; o primeiro foi observado falhar antes da implementação.
+- Revisão de segurança aplicável: saída textual/atributos via `htmlPublico`, URL da foto validada por `urlFotoProfissional`; conexão falha com mensagem pública genérica e log sem dados do cliente. Sem novas entradas externas ou operações de escrita.
+- A inspeção visual desktop/mobile fica para a Task 4, depois da cópia dos CSS/JS ao DocumentRoot; nenhuma conferência de navegador foi alegada nesta task.
+- Skills: `using-superpowers`, `brainstorming` (escopo aprovado no handoff/spec), `test-driven-development`, `frontend-ui-engineering` e `incremental-implementation`.
+- Próxima ação autorizada: Task 3 — catálogo dinâmico e conteúdo complementar, mantendo a mesma worktree `fase-3-site-dinamico`. Não iniciar Fase 4, deploy, commit ou push sem as aprovações previstas.
 ## Modelo para o proximo encerramento
 
 1. Data, branch e fase.
