@@ -96,7 +96,22 @@ Iniciar a Fase 3 na worktree `fase-3-site-dinamico`, partindo de `main` apos a i
 - Revisão de segurança aplicável: saída textual/atributos via `htmlPublico`, URL da foto validada por `urlFotoProfissional`; conexão falha com mensagem pública genérica e log sem dados do cliente. Sem novas entradas externas ou operações de escrita.
 - A inspeção visual desktop/mobile fica para a Task 4, depois da cópia dos CSS/JS ao DocumentRoot; nenhuma conferência de navegador foi alegada nesta task.
 - Skills: `using-superpowers`, `brainstorming` (escopo aprovado no handoff/spec), `test-driven-development`, `frontend-ui-engineering` e `incremental-implementation`.
-- Próxima ação autorizada: Task 3 — catálogo dinâmico e conteúdo complementar, mantendo a mesma worktree `fase-3-site-dinamico`. Não iniciar Fase 4, deploy, commit ou push sem as aprovações previstas.
+- Integração: commit `118760e` (`feat: renderizar shell e seção sobre dinâmicos`) integrado por fast-forward em `main` e publicado em `origin/main`. `main` e a branch de trabalho ficaram alinhadas nesse commit.
+
+## Handoff para abertura da Task 3 — 2026-09-30
+
+- **Workspace:** `C:\Users\Jose Tavares\anareiki\.worktrees\fase-3-site-dinamico`.
+- **Branch e commit base:** `fase-3-site-dinamico`, iniciando a Task 3 em `118760ec3a951f6efbcbf381bece369eedf8ede3` (também publicado em `main` e `origin/main`).
+- **Objetivo autorizado:** completar a apresentação pública dinâmica com cards dos serviços ativos e conteúdo complementar estático, preservando o design aprovado.
+- **Escopo autorizado:** Task 3 do plano `docs/superpowers/plans/2026-09-30-site-publico-dinamico.md`: criar `services.php`, `sessions-packages.php`, `availability-gallery.php` e `contact-footer.php`; ampliar `tests/HomePageTest.php`; usar repositories e helpers existentes. Não incluir cópia de assets (Task 4), agendamento (Fase 4), CRUD admin (Fase 5), mudanças de schema/seed nem imagens de exemplo.
+- **Documentos de contexto:** ler este handoff, `docs/PLANO_MESTRE_ANAREIKI.md`, o plano e spec da Fase 3, `docs/ARCHITECTURE.md`, `docs/DESIGN-SYSTEM.md`, `docs/API.md`, `docs/RULES.md` e `docs/checklist_seguranca_agente_desenvolvimento.md`.
+- **Estado inicial:** Task 1 e Task 2 concluídas; PHPUnit 25/25 (267 asserções), PHPCS e PHPStan aprovados. A worktree estava limpa após o commit `118760e`. Ativos CSS/JS públicos ainda estão somente em `public/static/`; `public_html/static/` ainda não tem a cópia pública, prevista na Task 4.
+- **Decisões herdadas:** todo conteúdo do banco deve passar por `htmlPublico`; imagem de serviço por `urlImagemServico`; foto profissional por `urlFotoProfissional`. Rejeitar texto HTML ativo e URLs fora das allowlists. Preço nulo deve mostrar “Consultar valor”; duração em minutos; não inventar benefícios que não existam no schema.
+- **Pendências/riscos:** a inspeção visual desktop/mobile da home ainda não foi feita; fazer na Task 4 depois da cópia dos ativos. Rotacionar a senha SMTP antes do deploy da Fase 7. A cobertura concorrente das escritas atômicas de OTP continua fora deste escopo.
+- **Primeira ação:** revisar o schema de `servicos`, o markup legado em `src/views/home/services.ts`, `sessions.ts`, `packages.ts`, `availability.ts`, `gallery.ts`, `contact.ts` e `footer.ts`, e os estilos correspondentes; então ampliar o contrato PHPUnit para saída escapada, campos opcionais e estado sem serviços antes de implementar.
+- **Verificação esperada:** teste focado e gates PHP (`composer.bat test`, `composer.bat cs`, `composer.bat stan`, `php -l` nos arquivos alterados); registrar os resultados no handoff ao concluir.
+- **Git:** autorização de commit/merge/push foi específica à entrega da Task 2. Obter aprovação explícita para operações Git da Task 3 antes de executá-las; Jose conduz esse fluxo.
+
 ## Modelo para o proximo encerramento
 
 1. Data, branch e fase.

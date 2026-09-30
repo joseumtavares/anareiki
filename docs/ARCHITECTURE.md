@@ -1,7 +1,7 @@
 # Arquitetura — Reiki Ana
 
-Status: arquitetura-alvo da migração para PHP + MySQL (fundação ainda não implementada)
-Última revisão: 2026-09-25
+Status: arquitetura-alvo da migração para PHP + MySQL (Fase 3 em andamento)
+Última revisão: 2026-09-30
 
 > **Governança:** o status de execução de cada fase (concluída/parcial/bloqueada) é controlado em `PLANO_MESTRE_ANAREIKI.md`. Este documento descreve a arquitetura técnica; não deve ser usado para acompanhar andamento de fase.
 
@@ -26,20 +26,23 @@ Condução por fases (detalhe em `PLANO_MESTRE_ANAREIKI.md` §3):
 
 ## 2. Estado atual do repositório
 
-Hoje o repositório contém o protótipo estático empacotado em Hono/Cloudflare:
+O repositório mantém o protótipo Hono/Cloudflare durante a migração e já contém a fundação PHP da Fase 2. A Fase 3 está em andamento: a Task 1 adicionou consultas públicas e helpers de saída; a Task 2 conectou os profissionais ativos ao shell da home e à seção “Sobre”. O catálogo de serviços, o restante do conteúdo, a cópia dos ativos públicos para o DocumentRoot e a conferência visual ainda estão pendentes conforme `docs/superpowers/plans/2026-09-30-site-publico-dinamico.md`.
 
 ```text
 Anareiki/
-├── src/index.tsx        # legado — HTML da home como string Hono
-├── src/renderer.tsx     # legado
-├── public/static/style-01-foundation.css (tokens/base) + five CSS modules   # identidade visual (será preservada)
-├── public/static/app.js      # interações de UI (será preservada)
+├── public_html/index.php             # shell PHP atual; consulta profissionais ativos
+├── public_html/includes/             # PDO, repositories, helpers públicos e autenticação
+├── public_html/includes/layout/home/ # head, navegação e seção Sobre (Task 2)
+├── public_html/static/               # admin-auth.js; ativos públicos serão copiados na Task 4
+├── src/index.tsx                     # legado — HTML da home como string Hono
+├── src/renderer.tsx                  # legado
+├── public/static/                     # CSS e JS atuais; origens preservadas até a Fase 8
 ├── public/favicon.svg
-├── wrangler.jsonc · vite.config.ts · ecosystem.config.cjs   # legado — remover na Fase 8
+├── wrangler.jsonc · vite.config.ts · ecosystem.config.cjs # legado — remover na Fase 8
 └── docs/
 ```
 
-Ainda **não existem**: backend PHP, banco, autenticação, CRUD ou regras de negócio. Serão criados por fase, com aprovação.
+O schema e o seed estão nas migrações 001 e 002; a autenticação admin com 2FA e a fundação PDO também estão implementadas. O site público PHP ainda está parcial: a home não deve ser considerada visualmente concluída até a Task 4. Agendamento e CRUD administrativo permanecem nas fases posteriores.
 
 ---
 
@@ -136,7 +139,9 @@ public_html/
 │   ├── csrf.php             # geração/validação de token
 │   ├── slots.php            # geração de horários e validação de conflito
 │   ├── repositories.php     # consultas (serviços, profissionais, agendamentos)
-│   └── layout/header.php · footer.php · admin.php (topo/rodapé Bootstrap do painel)
+│   └── layout/
+│       ├── admin.php         # topo/rodapé Bootstrap do painel
+│       └── home/             # head.php, top.php, about.php (Task 2)
 ├── api/
 │   └── slots.php            # JSON: horários livres p/ serviço+profissional+data
 ├── admin/
@@ -147,7 +152,7 @@ public_html/
 │   ├── disponibilidade.php
 │   └── agendamentos.php
 ├── static/
-    - style-01-foundation.css through style-06-footer-responsive.css # modular styles, visual identity preserved
+│   ├── style-01-foundation.css through style-06-footer-responsive.css # copy planned in Task 4
 │   ├── app.js               # interações públicas
 │   ├── admin.js             # interações do painel (Bootstrap)
 │   └── img/                 # imagens baixadas do genspark (Fase 6)

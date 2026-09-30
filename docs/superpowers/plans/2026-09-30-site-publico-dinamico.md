@@ -17,7 +17,7 @@
 - Escapar todo conteúdo dinâmico. Foto de profissional aceita apenas caminho local `/static/...`; imagens de serviço preservam caminho local ou HTTPS de `www.genspark.ai`.
 - SQL fica em `includes/repositories.php`, usa colunas explícitas e nunca retorna dados de clientes.
 - Manter cada PHP abaixo de 350 linhas e o visual atual.
-- Jose conduz Git; commit, merge e push dependem de autorização explícita. Jose autorizou essas operações para a Task 1 em 2026-09-30.
+- Jose conduz Git; commit, merge e push dependem de autorização explícita por entrega. As operações da Task 1 e da Task 2 foram autorizadas por Jose em 2026-09-30.
 
 ## Foco de revisão
 
