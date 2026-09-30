@@ -54,11 +54,11 @@
 
 **Arquivos:** criar `public_html/includes/layout/home/services.php`, `sessions-packages.php`, `availability-gallery.php` e `contact-footer.php`; atualizar `tests/HomePageTest.php`.
 
-- [ ] Acrescentar testes para cards de serviço escapados, preço nulo “Consultar valor”, duração, ícone/placeholder e estado sem serviços.
-- [ ] Confirmar falha dos testes antes da implementação.
-- [ ] Renderizar serviços ativos pela ordem dos repositories, com imagem apenas quando a URL existente for aprovada pelo helper; não criar benefícios ausentes do schema.
-- [ ] Preservar sessões, pacotes, disponibilidade, galeria, contato, footer e WhatsApp estáticos nos partials indicados.
-- [ ] Rodar teste focado e gates PHP.
+- [x] Acrescentar testes para cards de serviço escapados, preço nulo “Consultar valor”, duração, ícone/placeholder e estado sem serviços.
+- [x] Confirmar falha dos testes antes da implementação.
+- [x] Renderizar serviços ativos pela ordem dos repositories, com imagem apenas quando a URL existente for aprovada pelo helper; não criar benefícios ausentes do schema.
+- [x] Preservar sessões, pacotes, disponibilidade, galeria, contato, footer e WhatsApp estáticos nos partials indicados.
+- [x] Rodar teste focado e gates PHP.
 
 ### Task 4: Ativos estáticos no DocumentRoot PHP
 

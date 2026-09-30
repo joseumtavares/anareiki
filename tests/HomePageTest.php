@@ -67,4 +67,91 @@ final class HomePageTest extends TestCase
         self::assertSame(2, substr_count($html, '<img'));
         self::assertStringContainsString('src="/static/img/bia.webp"', $html);
     }
+
+    public function test_renderiza_catalogo_de_servicos_com_dados_escapados_e_opcionais(): void
+    {
+        require_once __DIR__ . '/../public_html/includes/public-view.php';
+        $servicos = [
+            [
+                'id' => 'servico-1',
+                'nome' => '<script>alert("XSS")</script>',
+                'descricao' => 'Relaxamento & cuidado',
+                'duracao_min' => 90,
+                'preco' => '75.00',
+                'imagem_url' => 'https://www.genspark.ai/api/files/s/imagem',
+                'icone' => null,
+                'cor' => null,
+                'tag' => 'Mais "pedida"',
+            ],
+            [
+                'id' => 'servico-2',
+                'nome' => 'Atendimento especial',
+                'descricao' => 'Descrição sem imagem',
+                'duracao_min' => 60,
+                'preco' => null,
+                'imagem_url' => 'https://exemplo.test/imagem.jpg',
+                'icone' => 'fa-hands',
+                'cor' => 'purple',
+                'tag' => null,
+            ],
+        ];
+
+        ob_start();
+        try {
+            require __DIR__ . '/../public_html/includes/layout/home/services.php';
+        } finally {
+            $html = (string) ob_get_clean();
+        }
+
+        self::assertStringContainsString('&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;', $html);
+        self::assertStringContainsString('Relaxamento &amp; cuidado', $html);
+        self::assertStringNotContainsString('<script>alert("XSS")</script>', $html);
+        self::assertStringContainsString('alt="&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;"', $html);
+        self::assertStringContainsString('src="https://www.genspark.ai/api/files/s/imagem"', $html);
+        self::assertStringContainsString('servico-img-placeholder purple', $html);
+        self::assertStringContainsString('fas fa-hands', $html);
+        self::assertStringNotContainsString('exemplo.test', $html);
+        self::assertStringContainsString('Mais &quot;pedida&quot;', $html);
+        self::assertStringContainsString('R$ 75,00', $html);
+        self::assertStringContainsString('Consultar valor', $html);
+        self::assertStringContainsString('90 min', $html);
+        self::assertStringContainsString('60 min', $html);
+    }
+
+    public function test_mostra_estado_neutro_quando_nao_ha_servicos(): void
+    {
+        require_once __DIR__ . '/../public_html/includes/public-view.php';
+        $servicos = [];
+
+        ob_start();
+        try {
+            require __DIR__ . '/../public_html/includes/layout/home/services.php';
+        } finally {
+            $html = (string) ob_get_clean();
+        }
+
+        self::assertStringContainsString('role="status"', $html);
+        self::assertStringContainsString('estarão disponíveis em breve', $html);
+        self::assertStringContainsString('<section id="servicos"', $html);
+        self::assertStringNotContainsString('Warning', $html);
+    }
+
+    public function test_preserva_secoes_complementares_estaticas_da_home(): void
+    {
+        ob_start();
+        require __DIR__ . '/../public_html/includes/layout/home/sessions-packages.php';
+        require __DIR__ . '/../public_html/includes/layout/home/availability-gallery.php';
+        require __DIR__ . '/../public_html/includes/layout/home/contact-footer.php';
+        $html = (string) ob_get_clean();
+        $html = (string) preg_replace('/\s+/', ' ', $html);
+
+        self::assertStringContainsString('Tabela de <span class="script">Sessões</span>', $html);
+        self::assertStringContainsString('Pacote Total Flex', $html);
+        self::assertStringContainsString('Horários <span class="script">Disponíveis</span>', $html);
+        self::assertStringContainsString('Galeria de', $html);
+        self::assertStringContainsString('Tratamentos', $html);
+        self::assertStringContainsString('id="contato"', $html);
+        self::assertStringContainsString('<footer class="footer">', $html);
+        self::assertStringContainsString('48 99613-7757', $html);
+    }
 }

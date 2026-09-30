@@ -120,3 +120,17 @@ Iniciar a Fase 3 na worktree `fase-3-site-dinamico`, partindo de `main` apos a i
 4. Testes/gates executados e resultados.
 5. Pendencias, bloqueios e riscos.
 6. Proximo passo autorizado e criterios de conclusao.
+
+## Conclusão da Task 3 — 2026-09-30
+
+- **Workspace:** `C:\Users\Jose Tavares\anareiki\.worktrees\fase-3-site-dinamico`.
+- **Branch/base herdadas:** `fase-3-site-dinamico`, aberta sobre `118760ec3a951f6efbcbf381bece369eedf8ede3`. Jose autorizou commit, fast-forward em `main` e push nesta sessão.
+- **Entrega:** catálogo de serviços ativos renderizado em `public_html/index.php`; imagens passam por `urlImagemServico`, textos/atributos por `htmlPublico`, cards mostram preço ou “Consultar valor” e duração em minutos. O footer mantém as âncoras legadas dos serviços.
+- **Conteúdo estático:** sessões e pacotes em `sessions-packages.php`; horários e galeria em `availability-gallery.php`; contato e footer em `contact-footer.php`.
+- **Testes:** `tests/HomePageTest.php` cobre texto/atributos escapados, URL rejeitada, preço nulo, preço formatado, duração, ícone/placeholder, estado vazio e preservação das seções estáticas. Antes da implementação, os dois testes novos falharam ao tentar carregar o partial inexistente.
+- **Verificações:** PHPUnit 28/28, 292 asserções; PHPCS 27 arquivos sem erros/avisos; PHPStan sem erros; `php -l` nos cinco PHPs alterados; `npm run check:lines` dentro do limite de 350 linhas.
+- **Segurança aplicável:** saída de banco continua escapada por `htmlPublico`; imagens de serviço somente aparecem após `urlImagemServico`; repositório existente usa colunas públicas explícitas e filtra `ativo = 1`. Não houve formulário, escrita, mudança de schema, autenticação, upload ou leitura de dado pessoal nesta tarefa.
+- **Limitações verificadas:** ativos de CSS/JS ainda não foram copiados para `public_html/static/`; conferência visual desktop/mobile no Apache fica para a Task 4. Nenhuma imagem ou perfil fictício foi adicionado. A pendência de rotação da senha SMTP antes do deploy continua aberta.
+- **Skills aplicadas:** `using-superpowers`, `brainstorming` (escopo/spec/handoff aprovados previamente), `test-driven-development`, `incremental-implementation`, `php-best-practices` e `verification-before-completion`.
+- **Próxima etapa:** Task 4 — copiar os seis CSS e `app.js` para `public_html/static/` sem alterar as origens nem `admin-auth.js`, verificar correspondência dos arquivos e validar a home no Apache em desktop e mobile. A Task 5 atualizará a arquitetura e reunirá documentação, revisão e testes manuais finais.
+- **Primeira ação sugerida:** conferir o estado atual das origens e dos arquivos em `public_html/static/`, fazer apenas as cópias listadas no plano, e então executar a verificação visual/local.
