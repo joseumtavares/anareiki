@@ -141,6 +141,16 @@ Iniciar a Fase 3 na worktree `fase-3-site-dinamico`, partindo de `main` apos a i
 5. Pendencias, bloqueios e riscos.
 6. Proximo passo autorizado e criterios de conclusao.
 
+## Conclusao da Task 4 — 2026-10-01
+
+- **Workspace/branch/base:** `C:\Users\Jose Tavares\anareiki\.worktrees\fase-3-task4-ativos`, branch `fase-3-task4-ativos`, baseada no commit `90e32be`.
+- **Entrega:** os seis CSS e `app.js` estão disponíveis em `public_html/static/`; `admin-auth.js` e as origens em `public/static/` foram preservados. Seis arquivos têm SHA-256 idêntico à origem. `style-06-footer-responsive.css` difere intencionalmente pela correção do menu móvel já registrada acima.
+- **Validação:** `npm.cmd run check:lines` passou; `npm.cmd run lint` passou sem erros ou avisos. A home e os sete ativos responderam HTTP 200 em `localhost:8080`. Jose confirmou que a inspeção visual da home dinâmica está funcionando.
+- **Escopo:** nenhum PHP, schema, seed ou conteúdo público foi alterado nesta task; nenhuma imagem fictícia foi incluída.
+- **Skills:** `using-superpowers`, `using-agent-skills`, `using-git-worktrees`, `brainstorming` (escopo fixado pelo plano existente) e `incremental-implementation`.
+- **Próximo passo:** Task 5 — atualizar `docs/ARCHITECTURE.md`, revisar o estado sem foto contra o sistema visual, rodar a suíte PHPUnit, `composer cs`, `composer stan`, `npm run check:lines` e `git diff --check`; então entregar os testes manuais e aguardar aprovação antes de qualquer commit/push ou início da Fase 4.
+- **Git:** worktree e branch criados a pedido de Jose. Não houve commit, merge ou push.
+
 ## Conclusão da Task 3 — 2026-09-30
 
 - **Workspace:** `C:\Users\Jose Tavares\anareiki\.worktrees\fase-3-site-dinamico`.

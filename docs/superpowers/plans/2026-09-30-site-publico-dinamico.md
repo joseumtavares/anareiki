@@ -65,11 +65,11 @@
 **Arquivos:** copiar `style-01-foundation.css`, `style-02-hero-about.css` e `style-03-services-sessions.css` de `public/static/` para `public_html/static/`; copiar `style-04-packages-hours.css`, `style-05-gallery-contact.css`, `style-06-footer-responsive.css` e `app.js` para o mesmo destino.
 
 - [x] Copiar os ativos sem editar/remover as origens e sem substituir `public_html/static/admin-auth.js`.
-- [x] Confirmar que os nomes e conteúdos copiados correspondem às origens (SHA-256 idêntico nos sete arquivos).
+- [x] Confirmar os nomes e conteúdos: SHA-256 idêntico em seis arquivos; `style-06-footer-responsive.css` difere intencionalmente pela correção responsiva descrita abaixo.
 - [x] Rodar `npm run check:lines` (passou) e ESLint (passou; `app.js` foi copiado sem ajustes).
-- [ ] Conferir manualmente no Apache local desktop/mobile, conteúdo carregado, campos opcionais e estados vazio/erro; registrar bloqueios de configuração local.
+- [x] Conferir no Apache local a home e os sete ativos; Jose confirmou que os testes visuais da home dinâmica estão funcionando.
 
-**Andamento em 2026-09-30:** o Apache em `http://localhost:8080/` respondeu HTTP 200, mas os sete caminhos `/static/...` retornaram 404. O servidor está apontando para outro `DocumentRoot`, não para esta worktree. Não havia navegador disponível nesta sessão, então a conferência visual desktop/mobile e dos estados dinâmicos permanece pendente.
+**Validação final em 2026-10-01:** `http://localhost:8080/` e os sete caminhos `/static/...` responderam HTTP 200. O Apache local está configurado para a cópia principal do projeto; ela contém o mesmo estado de arquivos desta worktree. Jose confirmou a inspeção visual da home dinâmica. Nenhum bloqueio local permanece registrado para a Task 4.
 
 **Correção responsiva em 2026-09-30:** após a cópia, `public_html/static/style-06-footer-responsive.css` foi ajustado para remover o padding vertical do menu fechado; o estado `.open` restaura `padding: 20px`. `public/static/style-06-footer-responsive.css` permanece intacto. O teste de regressão falhou antes e passou depois. O Chrome headless deste ambiente limita viewports menores que 500 CSS px; a conferência final nas larguras exatas informadas pelo usuário ainda requer Chrome normal.
 
