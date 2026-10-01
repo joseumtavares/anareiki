@@ -1,7 +1,7 @@
 # Arquitetura — Reiki Ana
 
-Status: arquitetura-alvo da migração para PHP + MySQL (Fase 3 em andamento)
-Última revisão: 2026-09-30
+Status: arquitetura PHP + MySQL; Fase 3 concluída
+Última revisão: 2026-10-01
 
 > **Governança:** o status de execução de cada fase (concluída/parcial/bloqueada) é controlado em `PLANO_MESTRE_ANAREIKI.md`. Este documento descreve a arquitetura técnica; não deve ser usado para acompanhar andamento de fase.
 
@@ -26,14 +26,14 @@ Condução por fases (detalhe em `PLANO_MESTRE_ANAREIKI.md` §3):
 
 ## 2. Estado atual do repositório
 
-O repositório mantém o protótipo Hono/Cloudflare durante a migração e já contém a fundação PHP da Fase 2. A Fase 3 está em andamento: a Task 1 adicionou consultas públicas e helpers de saída; a Task 2 conectou os profissionais ativos ao shell da home e à seção “Sobre”. O catálogo de serviços, o restante do conteúdo, a cópia dos ativos públicos para o DocumentRoot e a conferência visual ainda estão pendentes conforme `docs/superpowers/plans/2026-09-30-site-publico-dinamico.md`.
+O repositório mantém o protótipo Hono/Cloudflare durante a migração e já contém a fundação PHP da Fase 2. As Tasks 1–5 da Fase 3 implementaram e documentaram a home dinâmica: repositories consultam serviços e profissionais ativos, templates PHP compõem o conteúdo, e os ativos necessários estão em `public_html/static/`. Jose confirmou a validação manual responsiva nas resoluções 360×800, 375×667, 390×844, 412×915, 430×932, 768×1024 e 800×1280. A Fase 3 está encerrada; agendamento e CRUD administrativo permanecem nas fases posteriores.
 
 ```text
 Anareiki/
-├── public_html/index.php             # shell PHP atual; consulta profissionais ativos
+├── public_html/index.php             # home PHP; consulta serviços e profissionais ativos
 ├── public_html/includes/             # PDO, repositories, helpers públicos e autenticação
-├── public_html/includes/layout/home/ # head, navegação e seção Sobre (Task 2)
-├── public_html/static/               # admin-auth.js; ativos públicos serão copiados na Task 4
+├── public_html/includes/layout/home/ # partials da home (sobre, serviços e conteúdo complementar)
+├── public_html/static/               # seis CSS, app.js e admin-auth.js
 ├── src/index.tsx                     # legado — HTML da home como string Hono
 ├── src/renderer.tsx                  # legado
 ├── public/static/                     # CSS e JS atuais; origens preservadas até a Fase 8
@@ -42,7 +42,7 @@ Anareiki/
 └── docs/
 ```
 
-O schema e o seed estão nas migrações 001 e 002; a autenticação admin com 2FA e a fundação PDO também estão implementadas. O site público PHP ainda está parcial: a home não deve ser considerada visualmente concluída até a Task 4. Agendamento e CRUD administrativo permanecem nas fases posteriores.
+O schema e o seed estão nas migrações 001 e 002; a autenticação admin com 2FA e a fundação PDO também estão implementadas. A home pública PHP carrega somente serviços e profissionais ativos, escapa conteúdo dinâmico e valida URLs de imagem pelas allowlists documentadas na especificação da Fase 3. Sem foto de profissional, o retrato é omitido; sem dados, a seção apresenta mensagem neutra. As Tasks 1–5 da Fase 3 foram encerradas; agendamento e CRUD administrativo permanecem nas fases posteriores.
 
 ---
 

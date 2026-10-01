@@ -1,7 +1,7 @@
 # Plano Mestre — Reiki Ana (Massoterapeuta)
 
-Status: planejamento aprovado da migração de stack
-Última revisão: 2026-09-25
+Status: Fase 3 concluída; Fase 4 não iniciada
+Última revisão: 2026-10-01
 
 > **Governança:** este é o documento-raiz do projeto. Ele diz **qual fase está autorizada agora** e qual o escopo aprovado. Os demais documentos (`ARCHITECTURE.md`, `API.md`, `DESIGN-SYSTEM.md`, `RULES.md`) descrevem *como* fazer; este diz *o que* e *quando*. Nenhuma fase começa sem a fase anterior concluída e aprovada.
 
@@ -76,16 +76,31 @@ A decisão do cliente (Jose) foi **evoluir para uma aplicação com backend**, a
 
 Cada fase só inicia após a anterior estar concluída, testada e aprovada (fluxo da seção 4).
 
-| Fase | Entrega | Depende de | Doc de referência |
+### 3.1. Marcadores de status
+
+| Marcador | Estado | Uso |
+|---|---|---|
+| 🟢 | Concluída | Entrega concluída, validada e registrada no handoff/histórico. |
+| 🟡 | Em andamento | Etapa iniciada, com tarefas, validações ou aprovações ainda pendentes. |
+| 🔴 | Não iniciada | Etapa ainda não começou ou aguarda a conclusão de dependências. |
+| 🛑 | Bloqueada | Não pode avançar até resolver uma dependência externa ou risco impeditivo. |
+
+### 3.2. Estado consolidado em 01 de outubro de 2026
+
+| Status | Etapa | Situação atual | Próximo portão |
 |---|---|---|---|
-| **1. Banco** | `sql/migrations/001_schema_inicial.sql` + tabela `migracoes` (UUID v7, `administradores`, `codigos_2fa`) + seed com serviços/profissional atuais | — | `ARCHITECTURE.md` §4 |
-| **2. Fundação PHP** | conexão PDO, `config.php` protegido, sessão + login admin **com 2FA por e-mail (PHPMailer + SMTP Hostinger)**, CSRF, `.htaccess`, script local de criação do admin, migração `002_limites_taxa` (rate limit), testes PHPUnit do 2FA | 1 | `ARCHITECTURE.md` §6 e §8, `RULES.md` §10 |
-| **3. Site público dinâmico** | `index.php`: serviços e profissionais vindos do banco, visual intacto | 2 | `DESIGN-SYSTEM.md` |
-| **4. Motor + fluxo de agendamento** | `agendar.php` + `includes/slots.php` (cálculo/validação) + **teste PHPUnit**; grava `pendente` | 3 | `API.md` §2, `ARCHITECTURE.md` §7 |
-| **5. Painel admin (Bootstrap)** | CRUD serviços, profissionais, disponibilidade; lista de agendamentos com troca de status | 2 | `DESIGN-SYSTEM.md` §admin |
-| **6. Imagens** | baixar as 10 imagens hoje hotlinkadas de `genspark.ai` para `static/img/` | 3 | risco §5 |
-| **7. Deploy Hostinger** | criar MySQL no hPanel, importar as migrações em ordem, subir arquivos, ativar SSL, configurar `config.php` | 1–6 | `ARCHITECTURE.md` §12 |
-| **8. Limpeza** | remover Hono/Cloudflare/Vite/Wrangler do repositório | 7 | — |
+| 🟢 | Fase 1 — Banco | Migração inicial `001_schema_inicial.sql`, tabela `migracoes`, schema e seed presentes; a fundação foi usada pelas etapas posteriores. | Nenhum; manter como base concluída. |
+| 🟢 | Fase 2 — Fundação PHP | Encerrada e aceita por Jose em 30/09/2026. PDO, configuração privada fora de `public_html`, sessão, login, 2FA por e-mail, CSRF, rate limit, UUID v7, PHPMailer e testes estão implementados. PHPUnit, build, ESLint, limite de linhas, PHPCS e PHPStan foram registrados como aprovados. Jose confirmou a rotação da senha SMTP em 01/10/2026. | Nenhum. |
+| 🟢 | Fase 3 — Site público dinâmico | Tasks 1–5 concluídas em 01/10/2026. Home dinâmica, documentação, gates e revisão encerrados; Jose aprovou a inspeção visual responsiva e autorizou commit, merge e push. | Encerrada; manter a home pública como base das fases seguintes. |
+| 🔴 | Fase 4 — Motor e fluxo de agendamento | Não iniciada. Inclui consulta de horários, validação de conflito no servidor e gravação de agendamento como `pendente`. | Antes de implementar, apresentar proposta/modelagem, obter aprovação de Jose e revisão técnica conforme a seção 4. |
+| 🔴 | Fase 5 — Painel admin (Bootstrap) | Não iniciada. Inclui CRUD de serviços, profissionais e disponibilidade, além da gestão de status dos agendamentos. | Aguardar os portões de fase e definir a sequência de execução com o estado da Fase 4; não implementar fora do fluxo de aprovação. |
+| 🔴 | Fase 6 — Imagens | Não iniciada. Baixar as imagens externas ainda usadas no site para `public_html/static/img/`, verificando referências e licenças/origem conforme aplicável. | Inventariar as imagens restantes após a Fase 3 e migrá-las sem quebrar o visual aprovado. |
+| 🔴 | Fase 7 — Deploy Hostinger | Não iniciada. Implantar banco e aplicação no hPanel, habilitar SSL e configurar credenciais privadas. | Depende das Fases 1–6. Rotação SMTP confirmada; verificar configuração real no ambiente Hostinger. |
+| 🔴 | Fase 8 — Limpeza | Não iniciada. Remover Hono, Cloudflare, Vite e Wrangler do repositório legado. | Depende do deploy validado (Fase 7). |
+
+**Pendências transversais registradas:** (1) ampliar a cobertura de testes de concorrência das escritas atômicas do OTP antes de alterar essa persistência. A senha SMTP foi rotacionada, conforme confirmação de Jose em 01/10/2026. A validação visual automatizada do painel admin não foi realizada e deve ser considerada nas verificações aplicáveis antes do deploy.
+
+O estado acima foi consolidado a partir de `docs/HANDOFF.md`, dos arquivos presentes no repositório e do histórico publicado em `main`. A Fase 3 foi encerrada com o aceite de Jose em 01/10/2026; a Fase 4 continua não iniciada.
 
 ---
 

@@ -71,18 +71,20 @@
 
 **Validação final em 2026-10-01:** `http://localhost:8080/` e os sete caminhos `/static/...` responderam HTTP 200. O Apache local está configurado para a cópia principal do projeto; ela contém o mesmo estado de arquivos desta worktree. Jose confirmou a inspeção visual da home dinâmica. Nenhum bloqueio local permanece registrado para a Task 4.
 
-**Correção responsiva em 2026-09-30:** após a cópia, `public_html/static/style-06-footer-responsive.css` foi ajustado para remover o padding vertical do menu fechado; o estado `.open` restaura `padding: 20px`. `public/static/style-06-footer-responsive.css` permanece intacto. O teste de regressão falhou antes e passou depois. O Chrome headless deste ambiente limita viewports menores que 500 CSS px; a conferência final nas larguras exatas informadas pelo usuário ainda requer Chrome normal.
+**Validação responsiva manual em 2026-10-01:** Jose confirmou que a home funcionou corretamente nas resoluções 360×800, 375×667, 390×844, 412×915, 430×932, 768×1024 e 800×1280, e que os testes manuais/visuais foram efetuados e aprovados.
+
+**Correção responsiva em 2026-09-30:** após a cópia, `public_html/static/style-06-footer-responsive.css` foi ajustado para remover o padding vertical do menu fechado; o estado `.open` restaura `padding: 20px`. `public/static/style-06-footer-responsive.css` permanece intacto. O teste de regressão falhou antes e passou depois. Embora o Chrome headless deste ambiente limite viewports menores que 500 CSS px, Jose realizou e aprovou a conferência manual nas sete resoluções listadas acima.
 
 ### Task 5: Documentação e encerramento da etapa
 
 **Arquivos:** atualizar `docs/ARCHITECTURE.md`; atualizar `docs/DESIGN-SYSTEM.md` somente se o estado sem foto exigir nova regra; atualizar `docs/HANDOFF.md` e `tasks/todo.md`.
 
-- [ ] Rodar suíte PHPUnit, `composer cs`, `composer stan`, `npm run check:lines` e `git diff --check`.
-- [ ] Revisar escopo, acessibilidade, escaping, allowlists de imagem, ausência de imagens/textos fictícios na home pública e limites de 350 linhas.
-- [ ] Entregar a lista de testes manuais e aguardar aprovação antes de qualquer commit/push ou início da Fase 4.
+- [x] Rodar suíte PHPUnit, `composer cs`, `composer stan`, `npm run lint`, `npm run check:lines` e `git diff --check`.
+- [x] Revisar escopo, acessibilidade, escaping, allowlists de imagem, ausência de imagens/textos fictícios na home pública e limites de 350 linhas.
+- [x] Entregar a lista de testes manuais; Jose confirmou a execução e aprovação das sete resoluções em 2026-10-01. Jose autorizou commit, merge e push nesta entrega. A Fase 4 permanece não iniciada.
 
 ## Checkpoint final
 
-- [ ] `public_html/index.php` carrega apenas serviços/profissionais ativos e mantém o visual aprovado.
-- [ ] Testes e gates aplicáveis passam; eventuais bloqueios manuais ficam no handoff.
-- [ ] Sem alterações em schema/seed, imagens de exemplo, commits, pushes ou escopo de fases futuras.
+- [x] `public_html/index.php` carrega apenas serviços/profissionais ativos e mantém o visual aprovado.
+- [x] Testes e gates aplicáveis passam; a aprovação visual manual está registrada no handoff.
+- [x] Sem alterações em schema/seed ou imagens de exemplo; commits, merge e push autorizados por Jose.

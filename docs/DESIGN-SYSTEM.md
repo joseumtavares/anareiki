@@ -1,7 +1,7 @@
 # Design System — Reiki Ana
 
 Status: design system inicial extraído do frontend atual (`public/static/style-01-foundation.css`)
-Última revisão: 2026-09-25
+Última revisão: 2026-10-01
 
 > **Governança:** o status da fase de frontend está em `PLANO_MESTRE_ANAREIKI.md`. Modernizações visuais aqui descritas dependem de apresentação e aprovação do Jose antes da implementação. A identidade aprovada **deve ser preservada** na migração para PHP.
 
@@ -167,6 +167,8 @@ Só no painel. Usar tabela responsiva do Bootstrap com:
 ## 12. Estados obrigatórios
 
 Todo elemento interativo deve cobrir: `hover`, `focus-visible`, `active`, `disabled`; e listas/consultas: `loading`, `empty`, `error`. Atualização assíncrona (calendário de horários, toasts) usa `aria-live="polite"`.
+
+Na lista de profissionais da seção “Sobre”, foto é opcional. Sem foto cadastrada, omitir o elemento de imagem e não criar retrato ou avatar fictício; manter nome e textos disponíveis no fluxo da seção. A home dinâmica foi conferida e aprovada sem exigir outro tratamento visual.
 
 ---
 

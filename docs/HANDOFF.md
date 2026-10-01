@@ -2,6 +2,24 @@
 
 Este documento e atualizado ao encerrar cada sessao. Ele e a fonte de transicao entre sessoes e deve ser lido antes de iniciar uma nova etapa do `PLANO_MESTRE_ANAREIKI.md`.
 
+## Atualizacao de pendencia transversal — 2026-10-01
+
+- Jose confirmou que a senha SMTP foi rotacionada no provedor. A pendencia anterior para a Fase 7 esta resolvida; antes do deploy, ainda sera necessario validar a configuracao no ambiente Hostinger.
+- A cobertura de testes de concorrencia das escritas atomicas de OTP permanece pendente antes de qualquer alteracao nessa persistencia.
+
+## Validacao manual responsiva da home — 2026-10-01
+
+- Jose confirmou que a home servida pela worktree funcionou corretamente e aprovou todos os testes manuais/visuais nas resolucoes 360×800, 375×667, 390×844, 412×915, 430×932, 768×1024 e 800×1280.
+- A validacao visual desktop/mobile da home esta concluida; os resultados dos gates automatizados estao registrados na secao de encerramento abaixo.
+
+## Encerramento da Fase 3 — 2026-10-01
+
+- Tasks 1–5 concluídas na worktree `C:\Users\Jose Tavares\anareiki\.worktrees\fase-3-site-dinamico`, branch `fase-3-site-dinamico`.
+- Documentação sincronizada: arquitetura da home PHP dinâmica, regra visual para profissional sem foto, plano, checklist e este handoff. Não houve alteração de schema, seed ou inclusão de imagem fictícia.
+- Gates executados nesta sessão: `composer.bat test` — 29/29 testes, 297 asserções; `composer.bat cs` — 28/28 arquivos sem erros/avisos; `composer.bat stan` — sem erros; `npm.cmd run lint` — sem erros/avisos; `npm.cmd run check:lines` — todos os arquivos dentro de 350 linhas; `git diff --check` — sem erros.
+- Testes manuais/visuais: Jose confirmou aprovação da home nas resoluções 360×800, 375×667, 390×844, 412×915, 430×932, 768×1024 e 800×1280.
+- Jose autorizou commit, merge em `main` e push em 2026-10-01. A Fase 3 está encerrada; a Fase 4 segue não iniciada e depende da proposta, aprovação e revisão previstas no Plano Mestre.
+
 ## Atualizacao complementar da sessao 2026-09-30 — interface de login
 
 - Tela de login recebeu fundo roxo em camadas, detalhes radiais sutis, cartão claro e hierarquia visual mais clara seguindo a paleta existente.
