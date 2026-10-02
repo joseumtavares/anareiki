@@ -20,6 +20,7 @@ export default [
         setTimeout: 'readonly',
         setInterval: 'readonly',
         window: 'readonly',
+        CustomEvent: 'readonly',
       },
     },
     rules: {

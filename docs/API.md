@@ -1,8 +1,8 @@
 # API — Reiki Ana
 
-Status: contrato-alvo dos endpoints (ainda não implementados; serão criados nas Fases 4–5)
-Escopo atual: PHP 8 + MySQL; monólito renderizado no servidor + 1 endpoint JSON para o calendário
-Última revisão: 2026-09-25
+Status: endpoints públicos implementados (Fase 4); endpoints admin planejados (Fase 5)
+Escopo atual: PHP 8 + MySQL; monólito renderizado no servidor + endpoints JSON para o calendário
+Última revisão: 2026-10-01
 
 > **Governança:** consulte `PLANO_MESTRE_ANAREIKI.md` para saber a fase vigente e o escopo aprovado antes de propor qualquer endpoint novo. Este arquivo define o **contrato e o padrão**; não autoriza, por si só, a criação de rotas.
 
@@ -26,7 +26,7 @@ Ainda assim, cada handler segue um contrato documentado (seção 5) para manter 
 
 - URL: `GET /api/slots.php`
 - Descrição: retorna os horários disponíveis de um profissional para um serviço em uma data. Alimenta o calendário de `agendar.php`.
-- Status: planejado (Fase 4).
+- Status: **implementado** (Fase 4).
 - Visibilidade: **pública**.
 - Autenticação: não exige.
 - Parâmetros (query): `servico` (UUID), `profissional` (UUID), `data` (`YYYY-MM-DD`).
@@ -46,14 +46,31 @@ Ainda assim, cada handler segue um contrato documentado (seção 5) para manter 
   - consulta com prepared statements; retorna **só horários**, nunca dados de outros clientes;
   - a lista é conveniência de UI — a validade real é **reconferida no servidor** ao gravar (2.2).
 
-### 2.2. Criar agendamento
+### 2.2. Profissionais por serviço (JSON)
+
+- URL: `GET /api/profissionais.php`
+- Descrição: retorna os profissionais ativos que realizam um serviço.
+- Status: **implementado** (Fase 4).
+- Visibilidade: **pública**.
+- Autenticação: não exige.
+- Parâmetros (query): `servico` (UUID).
+- Resposta de sucesso (`200`):
+
+```json
+[{ "id": "01a0db02-f800-76df-a6eb-97a169b3083f", "nome": "Ana" }]
+```
+
+- Respostas de erro:
+  - `400`: parâmetro ausente ou UUID inválido.
+
+### 2.3. Criar agendamento
 
 - URL: `POST /agendar.php`
 - Descrição: grava um pedido de agendamento como `pendente`.
-- Status: planejado (Fase 4).
+- Status: **implementado** (Fase 4).
 - Visibilidade: **pública**.
 - Autenticação: não exige. **Exige token CSRF** válido.
-- Body (form-urlencoded): `servico_id` (UUID), `profissional_id` (UUID), `data`, `hora_inicio`, `cliente_nome`, `cliente_telefone`, `cliente_email` (opcional), `observacao` (opcional), `csrf_token`.
+- Body (form-urlencoded): `servico_id` (UUID), `profissional_id` (UUID), `data`, `hora_inicio`, `cliente_nome`, `cliente_telefone`, `csrf_token`. Nota: `cliente_email` não é coletado nem gravado; `observacao` não é coletada (uso futuro do admin).
 - Regras de validação no servidor (obrigatórias, não confiar no front):
   1. serviço e profissional existem e estão ativos, e o profissional faz o serviço;
   2. `hora_inicio` cai dentro de uma faixa de `disponibilidade` daquele dia da semana;

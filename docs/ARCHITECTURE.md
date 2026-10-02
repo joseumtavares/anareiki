@@ -1,6 +1,6 @@
 # Arquitetura — Reiki Ana
 
-Status: arquitetura PHP + MySQL; Fase 3 concluída
+Status: arquitetura PHP + MySQL; Fase 4 concluída
 Última revisão: 2026-10-01
 
 > **Governança:** o status de execução de cada fase (concluída/parcial/bloqueada) é controlado em `PLANO_MESTRE_ANAREIKI.md`. Este documento descreve a arquitetura técnica; não deve ser usado para acompanhar andamento de fase.
@@ -26,14 +26,19 @@ Condução por fases (detalhe em `PLANO_MESTRE_ANAREIKI.md` §3):
 
 ## 2. Estado atual do repositório
 
-O repositório mantém o protótipo Hono/Cloudflare durante a migração e já contém a fundação PHP da Fase 2. As Tasks 1–5 da Fase 3 implementaram e documentaram a home dinâmica: repositories consultam serviços e profissionais ativos, templates PHP compõem o conteúdo, e os ativos necessários estão em `public_html/static/`. Jose confirmou a validação manual responsiva nas resoluções 360×800, 375×667, 390×844, 412×915, 430×932, 768×1024 e 800×1280. A Fase 3 está encerrada; agendamento e CRUD administrativo permanecem nas fases posteriores.
+O repositório mantém o protótipo Hono/Cloudflare durante a migração e já contém a fundação PHP da Fase 2. As Tasks 1–5 da Fase 3 implementaram a home dinâmica. A Fase 4 implementou o motor de agendamento: geração de slots, calendário vanilla JS, endpoints JSON, página de agendamento com POST handler e confirmação via WhatsApp. CRUD administrativo permanece nas fases posteriores.
 
 ```text
 Anareiki/
 ├── public_html/index.php             # home PHP; consulta serviços e profissionais ativos
+├── public_html/agendar.php           # fluxo de agendamento (form + calendário + POST)
+├── public_html/confirmacao-agendamento.php  # confirmação + link WhatsApp
+├── public_html/api/slots.php         # GET JSON: horários livres (rate limit 10/min)
+├── public_html/api/profissionais.php # GET JSON: profissionais por serviço
 ├── public_html/includes/             # PDO, repositories, helpers públicos e autenticação
+├── public_html/includes/slots.php    # geração de slots e validação de conflito
 ├── public_html/includes/layout/home/ # partials da home (sobre, serviços e conteúdo complementar)
-├── public_html/static/               # seis CSS, app.js e admin-auth.js
+├── public_html/static/               # CSS, JS público (calendar, agendar, confirmação)
 ├── src/index.tsx                     # legado — HTML da home como string Hono
 ├── src/renderer.tsx                  # legado
 ├── public/static/                     # CSS e JS atuais; origens preservadas até a Fase 8
@@ -42,7 +47,7 @@ Anareiki/
 └── docs/
 ```
 
-O schema e o seed estão nas migrações 001 e 002; a autenticação admin com 2FA e a fundação PDO também estão implementadas. A home pública PHP carrega somente serviços e profissionais ativos, escapa conteúdo dinâmico e valida URLs de imagem pelas allowlists documentadas na especificação da Fase 3. Sem foto de profissional, o retrato é omitido; sem dados, a seção apresenta mensagem neutra. As Tasks 1–5 da Fase 3 foram encerradas; agendamento e CRUD administrativo permanecem nas fases posteriores.
+O schema e o seed estão nas migrações 001 e 002; a autenticação admin com 2FA e a fundação PDO também estão implementadas. A home pública PHP carrega somente serviços e profissionais ativos, escapa conteúdo dinâmico e valida URLs de imagem. O motor de agendamento (Fase 4) inclui: geração de slots com detecção de conflito O(n), calendário vanilla JS responsivo, endpoints JSON com rate limit, página de agendamento com validação server-side e confirmação via WhatsApp. Dados do cliente (nome e telefone) são persistidos; e-mail nunca é gravado. CRUD administrativo permanece nas fases posteriores.
 
 ---
 

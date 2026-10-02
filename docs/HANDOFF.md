@@ -2,6 +2,19 @@
 
 Este documento e atualizado ao encerrar cada sessao. Ele e a fonte de transicao entre sessoes e deve ser lido antes de iniciar uma nova etapa do `PLANO_MESTRE_ANAREIKI.md`.
 
+## Encerramento da Fase 4 — 2026-10-01
+
+- **Branch:** `main` (Jose criará branch `fase-4-agendamento` para commit/merge).
+- **Entrega:** motor de agendamento completo — geração de slots, calendário vanilla JS, endpoints JSON, página de agendamento com validação server-side e confirmação via WhatsApp.
+- **Arquivos criados:** `public_html/agendar.php`, `public_html/confirmacao-agendamento.php`, `public_html/api/slots.php`, `public_html/api/profissionais.php`, `public_html/includes/slots.php`, `public_html/static/calendar.js`, `public_html/static/calendar.css`, `public_html/static/agendar.js`, `public_html/static/agendar.css`, `public_html/static/confirmacao.css`, `tests/SlotsTest.php`, `tests/AgendamentoTest.php`.
+- **Arquivos modificados:** `public_html/includes/repositories.php` (6 funções novas), `eslint.config.js` (CustomEvent global).
+- **Dados do cliente:** nome e telefone persistidos; e-mail NUNCA gravado (sempre NULL); demais dados enviados apenas pela mensagem WhatsApp.
+- **Segurança:** CSRF em todo POST, rate limit 10/min por IP em api/slots.php, índice único contra overbooking (409), revalidação server-side de slots, prepared statements em toda query.
+- **Gates:** PHPUnit 51/51 (347 asserções); PHPCS 0 erros nos arquivos da Fase 4; ESLint limpo; check:lines todos abaixo de 350 linhas.
+- **Rulings:** (1) `validarSlotDisponivel()` em repositories.php em vez de slots.php — segue padrão existente; (2) CustomEvent adicionado aos globals do ESLint — necessário para flat config.
+- **Validação manual pendente:** Jose deve testar fluxo completo em desktop e mobile (360px+), incluindo edge cases (data passada, CSRF inválido, overbooking, rate limit).
+- **Próxima etapa:** Fase 5 — painel admin (CRUD de serviços, profissionais, disponibilidade e agendamentos).
+
 ## Atualizacao de pendencia transversal — 2026-10-01
 
 - Jose confirmou que a senha SMTP foi rotacionada no provedor. A pendencia anterior para a Fase 7 esta resolvida; antes do deploy, ainda sera necessario validar a configuracao no ambiente Hostinger.
