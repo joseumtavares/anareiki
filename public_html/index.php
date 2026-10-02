@@ -34,6 +34,11 @@ require __DIR__ . '/includes/layout/home/sessions-packages.php';
 require __DIR__ . '/includes/layout/home/availability-gallery.php';
 require __DIR__ . '/includes/layout/home/contact-footer.php';
 ?>
+<a href="https://wa.me/5548996137757" target="_blank" rel="noopener"
+   class="whatsapp-float" aria-label="WhatsApp">
+  <i class="fab fa-whatsapp"></i>
+  <span class="wpp-tooltip">Tire suas dúvidas!</span>
+</a>
 <script src="/static/app.js" defer></script>
 </body>
 </html>

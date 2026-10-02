@@ -218,6 +218,11 @@ $fontesUrl = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,w
   </form>
 </div>
 
+<a href="https://wa.me/5548996137757" target="_blank" rel="noopener"
+   class="whatsapp-float" aria-label="WhatsApp">
+  <i class="fab fa-whatsapp"></i>
+  <span class="wpp-tooltip">Tire suas dúvidas!</span>
+</a>
 <script src="/static/calendar.js"></script>
 <script src="/static/agendar.js"></script>
 </body>

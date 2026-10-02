@@ -35,20 +35,20 @@ $preco = $agendamento['preco'] !== null
     ? 'R$ ' . number_format((float) $agendamento['preco'], 2, ',', '.')
     : 'Consultar valor';
 
-$mensagem = "* * * * 📆 MEU AGENDAMENTO * * * *\n"
-    . "👥 CLIENTE: *" . $agendamento['cliente_nome'] . "*\n"
-    . "📞 TELEFONE: " . $agendamento['cliente_telefone'] . "\n"
-    . " =-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=\n"
-    . "📌 DIA " . $dataFormatada . "\n"
-    . "⌚ HORÁRIO " . $agendamento['hora_inicio'] . "\n\n"
-    . "💆 PROFISSIONAL\n"
+$mensagem = "**** \u{1F4C6} MEU AGENDAMENTO ****\n"
+    . "\u{1F464} CLIENTE: *" . $agendamento['cliente_nome'] . "*\n"
+    . "\u{1F4DE} TELEFONE: " . $agendamento['cliente_telefone'] . "\n"
+    . "=-=-=-=-=-=-=-=-=-=-=-=-=-=\n"
+    . "\u{1F4CC} DIA " . $dataFormatada . "\n"
+    . "\u{231A} HORARIO " . $agendamento['hora_inicio'] . "\n\n"
+    . "\u{1F486} PROFISSIONAL\n"
     . $agendamento['profissional_nome'] . "\n\n"
-    . "✨ SERVIÇO\n"
+    . "\u{2728} SERVICO\n"
     . "*" . $agendamento['servico_nome'] . "* - " . $preco . "\n\n"
-    . "Olá!\n\n"
+    . "Ola!\n\n"
     . "Agendamento realizado com sucesso.\n"
-    . "Favor chegar com 10 minutos de antecedência.\n"
-    . "=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=\n\n"
+    . "Favor chegar com 10 minutos de antecedencia.\n"
+    . "=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n"
     . "COMPROVANTE DE AGENDAMENTO";
 
 $linkWhatsapp = 'https://wa.me/' . urlencode($whatsappPhone)
@@ -101,5 +101,10 @@ $fontesUrl = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,w
     <i class="fas fa-arrow-left"></i> Voltar ao início
   </a>
 </div>
+<a href="https://wa.me/5548996137757" target="_blank" rel="noopener"
+   class="whatsapp-float" aria-label="WhatsApp">
+  <i class="fab fa-whatsapp"></i>
+  <span class="wpp-tooltip">Tire suas dúvidas!</span>
+</a>
 </body>
 </html>

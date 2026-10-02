@@ -64,9 +64,8 @@ declare(strict_types=1);
         <div class="pacote-body"><p>Para aliviar estresse e ansiedade.</p><div class="pacote-detail"><i class="fas
         fa-circle-check" aria-hidden="true"></i> 4 sessões de 1h</div><div class="pacote-preco"><span class="de">De
         R$ 280,00</span><span class="por">Por R$ <strong>230,00</strong></span></div></div>
-        <a href="https://wa.me/5548996137757?text=Ol%C3%A1!%20Tenho%20interesse%20no%20Pacote%20Relax%20Total."
-        target="_blank" rel="noopener noreferrer" class="btn-pacote"><i class="fab fa-whatsapp"
-        aria-hidden="true"></i> Quero esse pacote</a>
+        <a href="/agendar.php" class="btn-pacote"><i class="fas fa-calendar-check"
+        aria-hidden="true"></i> Agendar</a>
       </div>
       <div class="pacote-card destaque-card">
         <div class="pacote-badge-top">🌟 Mais Popular</div>
@@ -74,18 +73,16 @@ declare(strict_types=1);
         <div class="pacote-body"><p>Relaxamento, leveza e bem-estar natural.</p><div class="pacote-detail"><i
         class="fas fa-circle-check" aria-hidden="true"></i> 4 sessões</div><div class="pacote-preco"><span
         class="de">De R$ 320,00</span><span class="por">Por R$ <strong>270,00</strong></span></div></div>
-        <a href="https://wa.me/5548996137757?text=Ol%C3%A1!%20Tenho%20interesse%20no%20Pacote%20Drenagem."
-        target="_blank" rel="noopener noreferrer" class="btn-pacote"><i class="fab fa-whatsapp"
-        aria-hidden="true"></i> Quero esse pacote</a>
+        <a href="/agendar.php" class="btn-pacote"><i class="fas fa-calendar-check"
+        aria-hidden="true"></i> Agendar</a>
       </div>
       <div class="pacote-card">
         <div class="pacote-header"><h3>Pacote Terapêutico</h3><div class="pacote-tag">Dores e tensões</div></div>
         <div class="pacote-body"><p>Foco em dores musculares e tensões.</p><div class="pacote-detail"><i class="fas
         fa-circle-check" aria-hidden="true"></i> 4 sessões + ventosaterapia</div><div class="pacote-preco"><span
         class="de">De R$ 320,00</span><span class="por">Por R$ <strong>270,00</strong></span></div></div>
-        <a href="https://wa.me/5548996137757?text=Ol%C3%A1!%20Tenho%20interesse%20no%20Pacote%20Terap%C3%AAutico."
-        target="_blank" rel="noopener noreferrer" class="btn-pacote"><i class="fab fa-whatsapp"
-        aria-hidden="true"></i> Quero esse pacote</a>
+        <a href="/agendar.php" class="btn-pacote"><i class="fas fa-calendar-check"
+        aria-hidden="true"></i> Agendar</a>
       </div>
       <div class="pacote-card">
         <div class="pacote-header"><h3>Pacote Detox Energético</h3><div class="pacote-tag">Renovar corpo e
@@ -95,10 +92,8 @@ declare(strict_types=1);
         class="fas fa-circle-check" aria-hidden="true"></i> + 1 sessão de massagem relaxante</div><div
         class="pacote-preco"><span class="de">De R$ 320,00</span><span class="por">Por R$
         <strong>250,00</strong></span></div></div>
-        <a
-        href="https://wa.me/5548996137757?text=Pacote%20Detox%20Energetico"
-        target="_blank" rel="noopener noreferrer" class="btn-pacote">
-          <i class="fab fa-whatsapp" aria-hidden="true"></i> Quero esse pacote
+        <a href="/agendar.php" class="btn-pacote">
+          <i class="fas fa-calendar-check" aria-hidden="true"></i> Agendar
         </a>
       </div>
       <div class="pacote-card">
@@ -107,28 +102,24 @@ declare(strict_types=1);
         <div class="pacote-body"><p>Sessão de massagem relaxante 1h + Reiki 30min.</p><div class="pacote-detail"><i
         class="fas fa-circle-check" aria-hidden="true"></i> 4 sessões</div><div class="pacote-preco"><span
         class="de">De R$ 520,00</span><span class="por">Por R$ <strong>380,00</strong></span></div></div>
-        <a href="https://wa.me/5548996137757?text=Ol%C3%A1!%20Tenho%20interesse%20no%20Pacote%20Relax%20Plus."
-        target="_blank" rel="noopener noreferrer" class="btn-pacote"><i class="fab fa-whatsapp"
-        aria-hidden="true"></i> Quero esse pacote</a>
+        <a href="/agendar.php" class="btn-pacote"><i class="fas fa-calendar-check"
+        aria-hidden="true"></i> Agendar</a>
       </div>
       <div class="pacote-card">
         <div class="pacote-header"><h3>Pacote Modeladora</h3><div class="pacote-tag">Modelagem e leveza</div></div>
         <div class="pacote-body"><p>Modelagem, leveza e bem-estar.</p><div class="pacote-detail"><i class="fas
         fa-circle-check" aria-hidden="true"></i> 4 sessões de 1h</div><div class="pacote-preco"><span class="de">De
         R$ 400,00</span><span class="por">Por R$ <strong>320,00</strong></span></div></div>
-        <a href="https://wa.me/5548996137757?text=Ol%C3%A1!%20Tenho%20interesse%20no%20Pacote%20Modeladora."
-        target="_blank" rel="noopener noreferrer" class="btn-pacote"><i class="fab fa-whatsapp"
-        aria-hidden="true"></i> Quero esse pacote</a>
+        <a href="/agendar.php" class="btn-pacote"><i class="fas fa-calendar-check"
+        aria-hidden="true"></i> Agendar</a>
       </div>
       <div class="pacote-card pacote-flex">
         <div class="pacote-header"><h3>Pacote Total Flex</h3><div class="pacote-tag">Monte seu pacote</div></div>
         <div class="pacote-body"><p>Feito para você que não gosta de cair na rotina. Monte o seu pacote
         personalizado!</p><div class="pacote-detail"><i class="fas fa-circle-check" aria-hidden="true"></i>
         Totalmente personalizado</div></div>
-        <a
-        href="https://wa.me/5548996137757?text=Pacote%20Total%20Flex"
-        target="_blank" rel="noopener noreferrer" class="btn-pacote btn-orcamento">
-          <i class="fab fa-whatsapp" aria-hidden="true"></i> Faça seu orçamento
+        <a href="/agendar.php" class="btn-pacote btn-orcamento">
+          <i class="fas fa-calendar-check" aria-hidden="true"></i> Agendar
         </a>
       </div>
     </div>

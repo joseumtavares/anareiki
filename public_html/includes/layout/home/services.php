@@ -66,6 +66,9 @@ $servicos = $servicos ?? [];
                   <i class="fas fa-clock" aria-hidden="true"></i> <?= $duracao ?> min
                 </span>
               </div>
+              <a href="/agendar.php" class="btn-primary servico-agendar">
+                <i class="fas fa-calendar-check" aria-hidden="true"></i> Agendar
+              </a>
             </div>
           </article>
           <?php endforeach; ?>

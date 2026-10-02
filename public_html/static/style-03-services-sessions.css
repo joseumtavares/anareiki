@@ -132,6 +132,14 @@
   gap: 5px;
 }
 
+.servico-agendar {
+  display: block;
+  text-align: center;
+  margin-top: 16px;
+  font-size: 0.9rem;
+  padding: 10px;
+}
+
 /* ---------- SESSÕES ---------- */
 .sessoes-section {
   padding: 100px 0;
