@@ -9,7 +9,8 @@
     "quality": "npm run lint && npm run check:lines",
     "preview": "wrangler pages dev",
     "deploy": "npm run build && wrangler pages deploy",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "build:vercel": "node scripts/build-vercel.mjs"
   },
   "dependencies": {
     "hono": "^4.12.12"
@@ -20,5 +21,8 @@
     "eslint": "^10.11.0",
     "vite": "^6.3.5",
     "wrangler": "^4.4.0"
+  },
+  "engines": {
+    "node": ">=22.18"
   }
 }

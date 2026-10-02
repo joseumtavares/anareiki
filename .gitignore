@@ -39,3 +39,7 @@ public_html/vendor/
 
 # misc
 .DS_Store
+
+# vercel static output
+dist-vercel/
+.vercel

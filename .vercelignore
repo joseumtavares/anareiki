@@ -1,0 +1,15 @@
+public_html
+config.php
+vendor
+sql
+tests
+docs
+tasks
+logotipo
+bin
+.worktrees
+.phpunit.cache
+.superpowers
+.mimocode
+.agents
+.claude
