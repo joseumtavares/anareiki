@@ -101,7 +101,7 @@ function adminTopo(string $titulo, bool $painel = false): void
 </head>
 <body>
 <main class="container py-5">
-<?php if ($painel) : ?>
+    <?php if ($painel) : ?>
 <nav class="navbar navbar-expand-lg bg-white rounded-4 shadow-sm mb-4 px-3" aria-label="Navegação administrativa">
   <a class="navbar-brand marca" href="/admin/">Reiki Ana</a>
   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#admin-menu"
@@ -117,9 +117,9 @@ function adminTopo(string $titulo, bool $painel = false): void
       <li class="nav-item"><a class="nav-link" href="/admin/agendamentos.php">Agendamentos</a></li>
     </ul>
     <div class="d-flex align-items-center gap-3">
-      <?php if (is_array($admin)) : ?>
-        <span class="small text-secondary"><?= e((string) ($admin['nome'] ?? '')) ?></span>
-      <?php endif; ?>
+        <?php if (is_array($admin)) : ?>
+        <span class="small text-secondary"><?= e($admin['nome']) ?></span>
+        <?php endif; ?>
       <form method="post" action="/admin/logout.php" class="mb-0">
         <?= csrfCampo() ?>
         <button type="submit" class="btn btn-outline-secondary btn-sm">Sair</button>
@@ -127,7 +127,7 @@ function adminTopo(string $titulo, bool $painel = false): void
     </div>
   </div>
 </nav>
-<?php endif; ?>
+    <?php endif; ?>
     <?php
 }
 
@@ -141,12 +141,13 @@ function adminBreadcrumb(array $itens): void
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
     <?php foreach ($itens as $indice => $item) : ?>
-      <?php $ultimo = $indice === array_key_last($itens); ?>
-      <li class="breadcrumb-item<?= $ultimo ? ' active' : '' ?>"<?= $ultimo ? ' aria-current="page"' : '' ?>>
+        <?php $ultimo = $indice === array_key_last($itens); ?>
+      <li class="breadcrumb-item<?= $ultimo ? ' active' : '' ?>"
+          <?= $ultimo ? 'aria-current="page"' : '' ?>>
         <?php if (!$ultimo && $item['url'] !== null) : ?>
           <a href="<?= e($item['url']) ?>"><?= e($item['rotulo']) ?></a>
         <?php else : ?>
-          <?= e($item['rotulo']) ?>
+            <?= e($item['rotulo']) ?>
         <?php endif; ?>
       </li>
     <?php endforeach; ?>
@@ -176,6 +177,7 @@ function adminAlerta(?string $mensagem, string $tipo = 'danger'): void
     }
     $tipoSeguro = in_array($tipo, ADMIN_FLASH_TIPOS, true) ? $tipo : 'info';
     ?>
-<div class="alert alert-<?= e($tipoSeguro) ?>" role="<?= $tipoSeguro === 'danger' ? 'alert' : 'status' ?>"><?= e($mensagem) ?></div>
+<div class="alert alert-<?= e($tipoSeguro) ?>"
+     role="<?= $tipoSeguro === 'danger' ? 'alert' : 'status' ?>"><?= e($mensagem) ?></div>
     <?php
 }
