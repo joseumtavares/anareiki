@@ -2,14 +2,17 @@
 
 declare(strict_types=1);
 
+require_once dirname(__DIR__) . '/admin.php';
+
 function e(?string $valor): string
 {
     return htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8');
 }
 
 /** Abre o HTML do painel: Bootstrap 5 com a identidade roxa (DESIGN-SYSTEM §14). */
-function adminTopo(string $titulo): void
+function adminTopo(string $titulo, bool $painel = false): void
 {
+    $admin = $painel && function_exists('adminLogado') ? adminLogado() : null;
     ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -98,6 +101,57 @@ function adminTopo(string $titulo): void
 </head>
 <body>
 <main class="container py-5">
+<?php if ($painel) : ?>
+<nav class="navbar navbar-expand-lg bg-white rounded-4 shadow-sm mb-4 px-3" aria-label="Navegação administrativa">
+  <a class="navbar-brand marca" href="/admin/">Reiki Ana</a>
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#admin-menu"
+          aria-controls="admin-menu" aria-expanded="false" aria-label="Abrir menu">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="admin-menu">
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <li class="nav-item"><a class="nav-link" href="/admin/">Painel</a></li>
+      <li class="nav-item"><a class="nav-link" href="/admin/servicos.php">Serviços</a></li>
+      <li class="nav-item"><a class="nav-link" href="/admin/profissionais.php">Profissionais</a></li>
+      <li class="nav-item"><a class="nav-link" href="/admin/disponibilidade.php">Disponibilidade</a></li>
+      <li class="nav-item"><a class="nav-link" href="/admin/agendamentos.php">Agendamentos</a></li>
+    </ul>
+    <div class="d-flex align-items-center gap-3">
+      <?php if (is_array($admin)) : ?>
+        <span class="small text-secondary"><?= e((string) ($admin['nome'] ?? '')) ?></span>
+      <?php endif; ?>
+      <form method="post" action="/admin/logout.php" class="mb-0">
+        <?= csrfCampo() ?>
+        <button type="submit" class="btn btn-outline-secondary btn-sm">Sair</button>
+      </form>
+    </div>
+  </div>
+</nav>
+<?php endif; ?>
+    <?php
+}
+
+/** @param list<array{rotulo: string, url: ?string}> $itens */
+function adminBreadcrumb(array $itens): void
+{
+    if ($itens === []) {
+        return;
+    }
+    ?>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <?php foreach ($itens as $indice => $item) : ?>
+      <?php $ultimo = $indice === array_key_last($itens); ?>
+      <li class="breadcrumb-item<?= $ultimo ? ' active' : '' ?>"<?= $ultimo ? ' aria-current="page"' : '' ?>>
+        <?php if (!$ultimo && $item['url'] !== null) : ?>
+          <a href="<?= e($item['url']) ?>"><?= e($item['rotulo']) ?></a>
+        <?php else : ?>
+          <?= e($item['rotulo']) ?>
+        <?php endif; ?>
+      </li>
+    <?php endforeach; ?>
+  </ol>
+</nav>
     <?php
 }
 
@@ -105,6 +159,9 @@ function adminRodape(): void
 {
     ?>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
 <script src="/static/admin-auth.js" defer></script>
 </body>
 </html>
@@ -117,7 +174,8 @@ function adminAlerta(?string $mensagem, string $tipo = 'danger'): void
     if ($mensagem === null) {
         return;
     }
+    $tipoSeguro = in_array($tipo, ADMIN_FLASH_TIPOS, true) ? $tipo : 'info';
     ?>
-<div class="alert alert-<?= e($tipo) ?>" role="<?= $tipo === 'danger' ? 'alert' : 'status' ?>"><?= e($mensagem) ?></div>
+<div class="alert alert-<?= e($tipoSeguro) ?>" role="<?= $tipoSeguro === 'danger' ? 'alert' : 'status' ?>"><?= e($mensagem) ?></div>
     <?php
 }
