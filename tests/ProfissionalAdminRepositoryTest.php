@@ -42,4 +42,20 @@ final class ProfissionalAdminRepositoryTest extends TestCase
         self::assertArrayHasKey('foto_url', $erros);
         self::assertArrayHasKey('servicos', $erros);
     }
+
+    public function test_exclui_profissional_sem_vinculos_ou_agendamentos(): void
+    {
+        $this->pdo->exec('CREATE TABLE agendamentos (id TEXT, profissional_id TEXT)');
+        $this->pdo->exec("INSERT INTO profissionais VALUES ('p2', 'Bia', NULL, NULL, NULL, 1)");
+        excluirProfissionalAdmin($this->pdo, 'p2');
+        self::assertNull(obterProfissionalAdmin($this->pdo, 'p2'));
+    }
+
+    public function test_bloqueia_exclusao_de_profissional_vinculado(): void
+    {
+        $this->pdo->exec('CREATE TABLE agendamentos (id TEXT, profissional_id TEXT)');
+        $this->pdo->exec("INSERT INTO profissional_servico VALUES ('p1', 's1')");
+        $this->expectException(DomainException::class);
+        excluirProfissionalAdmin($this->pdo, 'p1');
+    }
 }

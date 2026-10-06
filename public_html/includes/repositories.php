@@ -102,6 +102,30 @@ function obterProfissionalAdmin(PDO $pdo, string $id): ?array
     return $row !== false ? $row : null;
 }
 
+function excluirProfissionalAdmin(PDO $pdo, string $id): void
+{
+    $pdo->beginTransaction();
+    try {
+        $stmt = $pdo->prepare('SELECT 1 FROM profissional_servico WHERE profissional_id = ? LIMIT 1');
+        $stmt->execute([$id]);
+        $vinculado = $stmt->fetch() !== false;
+        $stmt = $pdo->prepare('SELECT 1 FROM agendamentos WHERE profissional_id = ? LIMIT 1');
+        $stmt->execute([$id]);
+        if ($vinculado || $stmt->fetch() !== false) {
+            throw new DomainException('Não é possível excluir um profissional com vínculos ou agendamentos.');
+        }
+        $stmt = $pdo->prepare('DELETE FROM profissionais WHERE id = ?');
+        $stmt->execute([$id]);
+        if ($stmt->rowCount() !== 1) {
+            throw new DomainException('Profissional não encontrado.');
+        }
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) { $pdo->rollBack(); }
+        throw $e;
+    }
+}
+
 /** @return array<string, mixed>|null */
 function obterServicoAdmin(PDO $pdo, string $id): ?array
 {
