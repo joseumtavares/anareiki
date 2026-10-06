@@ -23,6 +23,8 @@ final class ServicoAdminRepositoryTest extends TestCase
             imagem_url TEXT, icone TEXT, cor TEXT, tag TEXT,
             ativo INTEGER NOT NULL DEFAULT 1, ordem INTEGER NOT NULL DEFAULT 0
         )');
+        $this->pdo->exec('CREATE TABLE profissional_servico (profissional_id TEXT, servico_id TEXT)');
+        $this->pdo->exec('CREATE TABLE agendamentos (id TEXT, servico_id TEXT)');
         $this->pdo->exec("INSERT INTO servicos
             (id, nome, descricao, duracao_min, preco, categoria, ativo, ordem)
             VALUES ('ativo', 'Relaxante', 'Descrição', 60, 75.00, 'Massagens', 1, 2),
@@ -73,5 +75,20 @@ final class ServicoAdminRepositoryTest extends TestCase
         self::assertArrayHasKey('preco', $erros);
         self::assertArrayHasKey('imagem_url', $erros);
         self::assertArrayHasKey('ordem', $erros);
+    }
+
+    public function test_exclui_servico_sem_vinculos(): void
+    {
+        excluirServicoAdmin($this->pdo, 'inativo');
+
+        self::assertNull(obterServicoAdmin($this->pdo, 'inativo'));
+    }
+
+    public function test_rejeita_exclusao_com_vinculo_ou_agendamento(): void
+    {
+        $this->pdo->exec("INSERT INTO profissional_servico VALUES ('p1', 'ativo')");
+
+        $this->expectException(DomainException::class);
+        excluirServicoAdmin($this->pdo, 'ativo');
     }
 }

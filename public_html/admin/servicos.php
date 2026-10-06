@@ -17,10 +17,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrfValido($_POST['csrf_token'] ?? null)) {
         http_response_code(403);
         $erros['_geral'] = 'Sua sessão expirou. Recarregue a página e tente novamente.';
-    } elseif (($_POST['acao'] ?? '') === 'alternar') {
+    } elseif (($_POST['acao'] ?? '') === 'alternar' || ($_POST['acao'] ?? '') === 'excluir') {
         $id = (string) ($_POST['id'] ?? '');
         if (!uuidValido($id) || obterServicoAdmin($pdo, $id) === null) {
             $erros['_geral'] = 'Serviço não encontrado.';
+        } elseif (($_POST['acao'] ?? '') === 'excluir') {
+            try {
+                excluirServicoAdmin($pdo, $id);
+                adminFlash('Serviço excluído.');
+                redirecionar('/admin/servicos.php');
+            } catch (DomainException $e) {
+                $erros['_geral'] = $e->getMessage();
+            }
         } else {
             alterarAtivoServico($pdo, $id, (string) ($_POST['ativo'] ?? '0') === '1');
             adminFlash('Status do serviço atualizado.');
@@ -114,7 +122,7 @@ adminBreadcrumb([
     <div class="table-responsive">
       <table class="table align-middle"><thead><tr><th>Nome</th><th>Categoria</th><th>Duração</th><th>Status</th><th class="text-end">Ações</th></tr></thead><tbody>
       <?php foreach ($servicos as $servico) : ?>
-        <tr><td><?= e((string) $servico['nome']) ?></td><td><?= e((string) $servico['categoria']) ?></td><td><?= e((string) $servico['duracao_min']) ?> min</td><td><?= (int) $servico['ativo'] === 1 ? 'Ativo' : 'Inativo' ?></td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="/admin/servicos.php?editar=<?= e((string) $servico['id']) ?>">Editar</a> <form class="d-inline" method="post" action="/admin/servicos.php"><input type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>"><input type="hidden" name="acao" value="alternar"><input type="hidden" name="id" value="<?= e((string) $servico['id']) ?>"><input type="hidden" name="ativo" value="<?= (int) $servico['ativo'] === 1 ? '0' : '1' ?>"><button class="btn btn-sm btn-outline-secondary" type="submit"><?= (int) $servico['ativo'] === 1 ? 'Desativar' : 'Ativar' ?></button></form></td></tr>
+        <tr><td><?= e((string) $servico['nome']) ?></td><td><?= e((string) $servico['categoria']) ?></td><td><?= e((string) $servico['duracao_min']) ?> min</td><td><?= (int) $servico['ativo'] === 1 ? 'Ativo' : 'Inativo' ?></td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="/admin/servicos.php?editar=<?= e((string) $servico['id']) ?>">Editar</a> <form class="d-inline" method="post" action="/admin/servicos.php"><input type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>"><input type="hidden" name="acao" value="alternar"><input type="hidden" name="id" value="<?= e((string) $servico['id']) ?>"><input type="hidden" name="ativo" value="<?= (int) $servico['ativo'] === 1 ? '0' : '1' ?>"><button class="btn btn-sm btn-outline-secondary" type="submit"><?= (int) $servico['ativo'] === 1 ? 'Desativar' : 'Ativar' ?></button></form> <form class="d-inline" method="post" action="/admin/servicos.php" onsubmit="return confirm('Excluir este serviço permanentemente?');"><input type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>"><input type="hidden" name="acao" value="excluir"><input type="hidden" name="id" value="<?= e((string) $servico['id']) ?>"><button class="btn btn-sm btn-outline-danger" type="submit">Excluir</button></form></td></tr>
       <?php endforeach; ?>
       </tbody></table>
     </div>

@@ -111,6 +111,31 @@ function alterarAtivoServico(PDO $pdo, string $id, bool $ativo): void
     $stmt->execute([$ativo ? 1 : 0, $id]);
 }
 
+function excluirServicoAdmin(PDO $pdo, string $id): void
+{
+    $pdo->beginTransaction();
+    try {
+        $vinculo = $pdo->prepare('SELECT 1 FROM profissional_servico WHERE servico_id = ? LIMIT 1');
+        $vinculo->execute([$id]);
+        $agendamento = $pdo->prepare('SELECT 1 FROM agendamentos WHERE servico_id = ? LIMIT 1');
+        $agendamento->execute([$id]);
+        if ($vinculo->fetch() !== false || $agendamento->fetch() !== false) {
+            throw new DomainException('Não é possível excluir um serviço vinculado a profissionais ou agendamentos.');
+        }
+        $stmt = $pdo->prepare('DELETE FROM servicos WHERE id = ?');
+        $stmt->execute([$id]);
+        if ($stmt->rowCount() !== 1) {
+            throw new DomainException('Serviço não encontrado.');
+        }
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        throw $e;
+    }
+}
+
 /** @return list<array<string, mixed>> */
 function listarServicosPublicos(PDO $pdo): array
 {
