@@ -53,7 +53,7 @@ adminTopo('Painel', true);
   <p class="mb-0 text-secondary">Os próximos agendamentos aparecerão aqui quando o módulo de agenda for concluído.</p>
 </div>
 <div class="card p-4 mt-4">
-  <div class="d-flex justify-content-between align-items-center"><h2 class="h5 mb-0">Categorias</h2><a class="btn btn-sm btn-outline-primary" href="/admin/servicos.php">Adicionar categoria</a></div>
+  <div class="d-flex justify-content-between align-items-center"><h2 class="h5 mb-0">Categorias</h2><a class="btn btn-primary" href="/admin/servicos.php">Adicionar categoria</a></div>
   <p class="text-secondary mt-2 mb-2">Categorias disponíveis para os serviços:</p>
   <div class="d-flex flex-wrap gap-2"><?php foreach ($categorias as $categoria) : ?><span class="badge rounded-pill text-bg-light border"><?= e($categoria) ?></span><?php endforeach; ?><?php if ($categorias === []) : ?><span class="text-secondary">Nenhuma categoria cadastrada.</span><?php endif; ?></div>
 </div>
