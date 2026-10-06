@@ -23,6 +23,22 @@ function listarImagensUpload(string $categoria, ?string $baseDir = null): array
     return $resultado;
 }
 
+function excluirUploadImagem(string $url, ?string $baseDir = null): void
+{
+    if (preg_match('~\A/uploads/(servicos|profissionais)/([a-f0-9]{32}\.(?:jpg|jpeg|png|webp))\z~', $url, $partes) !== 1) {
+        throw new InvalidArgumentException('Imagem inválida.');
+    }
+    $raiz = realpath($baseDir ?? dirname(__DIR__) . '/uploads');
+    $arquivo = ($baseDir ?? dirname(__DIR__) . '/uploads') . DIRECTORY_SEPARATOR . $partes[1] . DIRECTORY_SEPARATOR . $partes[2];
+    $alvo = realpath($arquivo);
+    if ($raiz === false || $alvo === false || dirname($alvo) === $raiz || !str_starts_with($alvo, $raiz . DIRECTORY_SEPARATOR)) {
+        throw new InvalidArgumentException('Arquivo fora da pasta de uploads.');
+    }
+    if (!unlink($alvo)) {
+        throw new RuntimeException('Não foi possível excluir a imagem.');
+    }
+}
+
 /** @param array<string, mixed> $arquivo */
 function salvarUploadImagem(array $arquivo, string $categoria, ?string $baseDir = null): string
 {

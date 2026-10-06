@@ -15,14 +15,28 @@ $erros = [];
 $valores = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $acao = (string) ($_POST['acao'] ?? '');
     if (!csrfValido($_POST['csrf_token'] ?? null)) {
         http_response_code(403);
         $erros['_geral'] = 'Sua sessão expirou. Recarregue a página e tente novamente.';
-    } elseif (($_POST['acao'] ?? '') === 'alternar' || ($_POST['acao'] ?? '') === 'excluir') {
+    } elseif (in_array($acao, ['alternar', 'excluir', 'excluir_imagem'], true)) {
         $id = (string) ($_POST['id'] ?? '');
-        if (!uuidValido($id) || obterServicoAdmin($pdo, $id) === null) {
+        if ($acao === 'excluir_imagem') {
+            $imagem = (string) ($_POST['imagem'] ?? '');
+            if (imagemServicoEmUso($pdo, $imagem)) {
+                $erros['_geral'] = 'A imagem ainda está sendo usada por um serviço.';
+            } else {
+                try {
+                    excluirUploadImagem($imagem);
+                    adminFlash('Imagem excluída.');
+                    redirecionar('/admin/servicos.php');
+                } catch (InvalidArgumentException|RuntimeException $e) {
+                    $erros['_geral'] = $e->getMessage();
+                }
+            }
+        } elseif (!uuidValido($id) || obterServicoAdmin($pdo, $id) === null) {
             $erros['_geral'] = 'Serviço não encontrado.';
-        } elseif (($_POST['acao'] ?? '') === 'excluir') {
+        } elseif ($acao === 'excluir') {
             try {
                 excluirServicoAdmin($pdo, $id);
                 adminFlash('Serviço excluído.');
@@ -111,6 +125,10 @@ adminBreadcrumb([
                 <label class="card p-2 h-100">
                   <img class="img-fluid rounded" src="<?= e($imagem) ?>" alt="Miniatura disponível" loading="lazy" style="aspect-ratio:1;object-fit:cover">
                   <span class="form-check mt-2"><input class="form-check-input" type="radio" name="imagem_existente" value="<?= e($imagem) ?>" <?= adminValor($valores, 'imagem_url') === $imagem ? 'checked' : '' ?>> Usar esta imagem</span>
+                  <form method="post" action="/admin/servicos.php" class="mt-2" onsubmit="return confirm('Excluir esta imagem permanentemente?');">
+                    <?= csrfCampo() ?><input type="hidden" name="acao" value="excluir_imagem"><input type="hidden" name="id" value="<?= e((string) ($valores['id'] ?? '')) ?>"><input type="hidden" name="imagem" value="<?= e($imagem) ?>">
+                    <button class="btn btn-sm btn-outline-danger" type="submit">Excluir imagem</button>
+                  </form>
                 </label>
               </div>
             <?php endforeach; ?>

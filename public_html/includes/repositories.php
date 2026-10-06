@@ -111,6 +111,13 @@ function alterarAtivoServico(PDO $pdo, string $id, bool $ativo): void
     $stmt->execute([$ativo ? 1 : 0, $id]);
 }
 
+function imagemServicoEmUso(PDO $pdo, string $url): bool
+{
+    $stmt = $pdo->prepare('SELECT 1 FROM servicos WHERE imagem_url = ? LIMIT 1');
+    $stmt->execute([$url]);
+    return $stmt->fetch() !== false;
+}
+
 function excluirServicoAdmin(PDO $pdo, string $id): void
 {
     $pdo->beginTransaction();

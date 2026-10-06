@@ -14,6 +14,7 @@ final class AdminUploadTest extends TestCase
     {
         $this->baseDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'reiki-upload-' . bin2hex(random_bytes(4));
         mkdir($this->baseDir, 0775, true);
+        mkdir($this->baseDir . DIRECTORY_SEPARATOR . 'servicos', 0775, true);
     }
 
     protected function tearDown(): void
@@ -51,5 +52,22 @@ final class AdminUploadTest extends TestCase
             'name' => 'shell.php', 'type' => 'image/jpeg', 'tmp_name' => $arquivo,
             'error' => UPLOAD_ERR_OK, 'size' => filesize($arquivo),
         ], 'servicos', $this->baseDir);
+    }
+
+    public function test_exclui_apenas_imagem_do_diretorio_permitido(): void
+    {
+        $nome = str_repeat('a', 32) . '.jpg';
+        $arquivo = $this->baseDir . DIRECTORY_SEPARATOR . 'servicos' . DIRECTORY_SEPARATOR . $nome;
+        file_put_contents($arquivo, 'imagem');
+
+        excluirUploadImagem('/uploads/servicos/' . $nome, $this->baseDir);
+
+        self::assertFileDoesNotExist($arquivo);
+    }
+
+    public function test_rejeita_caminho_fora_da_pasta_de_upload(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        excluirUploadImagem('/config.php', $this->baseDir);
     }
 }
