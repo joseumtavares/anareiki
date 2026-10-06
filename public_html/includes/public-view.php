@@ -17,6 +17,10 @@ function urlImagemServico(?string $url): ?string
         return $url;
     }
 
+    if (preg_match('~\A/uploads/(servicos|profissionais)/[a-f0-9]{32}\.(?:jpg|png|webp)\z~D', $url) === 1) {
+        return $url;
+    }
+
     if (preg_match('~\Ahttps://www\.genspark\.ai/api/files/[A-Za-z0-9/_-]+\z~D', $url) === 1) {
         return $url;
     }

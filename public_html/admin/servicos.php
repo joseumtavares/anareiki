@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/admin.php';
 require_once __DIR__ . '/../includes/repositories.php';
+require_once __DIR__ . '/../includes/uploads.php';
 require_once __DIR__ . '/../includes/layout/admin.php';
 
 requireAdmin();
@@ -27,7 +28,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } else {
         $valores = $_POST;
-        $erros = validarDadosServicoAdmin($valores);
+        if (isset($_FILES['imagem_upload']) && ($_FILES['imagem_upload']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+            try {
+                $valores['imagem_url'] = salvarUploadImagem($_FILES['imagem_upload'], 'servicos');
+            } catch (InvalidArgumentException | RuntimeException $e) {
+                $erros['imagem_upload'] = $e->getMessage();
+            }
+        }
+        $erros = array_merge($erros, validarDadosServicoAdmin($valores));
         if ($erros === []) {
             salvarServicoAdmin($pdo, $valores);
             adminFlash(isset($valores['id']) && $valores['id'] !== '' ? 'Serviço atualizado.' : 'Serviço criado.');
@@ -64,14 +72,14 @@ adminBreadcrumb([
 </div>
 <div class="card p-3 p-md-4 mb-4">
   <h2 class="h5"><?= isset($valores['id']) && $valores['id'] !== '' ? 'Editar serviço' : 'Cadastrar serviço' ?></h2>
-  <form method="post" action="/admin/servicos.php" novalidate>
+  <form method="post" action="/admin/servicos.php" enctype="multipart/form-data" novalidate>
     <?= csrfCampo() ?>
     <?php if (!empty($valores['id'])) :
         ?><input type="hidden" name="id" value="<?= e((string) $valores['id']) ?>"><?php
     endif; ?>
     <div class="row g-3">
-      <?php foreach ([['nome', 'Nome', 'text'], ['categoria', 'Categoria', 'text'], ['duracao_min', 'Duração (minutos)', 'number'], ['preco', 'Preço (opcional)', 'number'], ['ordem', 'Ordem', 'number'], ['icone', 'Ícone', 'text'], ['cor', 'Cor', 'text'], ['tag', 'Tag', 'text'], ['imagem_url', 'URL da imagem', 'url']] as [$campo, $rotulo, $tipo]) : ?>
-        <div class="col-12 col-md-<?= in_array($campo, ['nome', 'categoria', 'imagem_url'], true) ? '6' : '4' ?>">
+      <?php foreach ([['nome', 'Nome', 'text'], ['categoria', 'Categoria', 'text'], ['duracao_min', 'Duração (minutos)', 'number'], ['preco', 'Preço (opcional)', 'number'], ['ordem', 'Ordem', 'number'], ['icone', 'Ícone', 'text'], ['cor', 'Cor', 'text'], ['tag', 'Tag', 'text']] as [$campo, $rotulo, $tipo]) : ?>
+        <div class="col-12 col-md-<?= in_array($campo, ['nome', 'categoria'], true) ? '6' : '4' ?>">
           <label class="form-label" for="<?= e($campo) ?>"><?= e($rotulo) ?></label>
           <input class="form-control<?= adminErro($erros, $campo) !== null ? ' is-invalid' : '' ?>" type="<?= e($tipo) ?>" id="<?= e($campo) ?>" name="<?= e($campo) ?>" value="<?= e(adminValor($valores, $campo)) ?>">
             <?php if (adminErro($erros, $campo) !== null) :
@@ -79,6 +87,14 @@ adminBreadcrumb([
             endif; ?>
         </div>
       <?php endforeach; ?>
+      <div class="col-12 col-md-6">
+        <label class="form-label" for="imagem_upload">Imagem do serviço</label>
+        <input class="form-control<?= adminErro($erros, 'imagem_upload') !== null ? ' is-invalid' : '' ?>" type="file" id="imagem_upload" name="imagem_upload" accept="image/jpeg,image/png,image/webp">
+        <div class="form-text">JPG, PNG ou WEBP, até 5 MB.</div>
+        <?php if (adminErro($erros, 'imagem_upload') !== null) :
+            ?><div class="invalid-feedback"><?= e((string) adminErro($erros, 'imagem_upload')) ?></div><?php
+        endif; ?>
+      </div>
       <div class="col-12">
         <label class="form-label" for="descricao">Descrição</label>
         <textarea class="form-control<?= adminErro($erros, 'descricao') !== null ? ' is-invalid' : '' ?>" id="descricao" name="descricao" rows="3"><?= e(adminValor($valores, 'descricao')) ?></textarea>
