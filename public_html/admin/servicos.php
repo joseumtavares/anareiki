@@ -52,9 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } else {
         $valores = $_POST;
-        if (trim((string) ($valores['nova_categoria'] ?? '')) !== '') {
-            $valores['categoria'] = trim((string) $valores['nova_categoria']);
-        }
         if (($valores['imagem_existente'] ?? '') !== '') {
             $imagemEscolhida = (string) $valores['imagem_existente'];
             if (in_array($imagemEscolhida, $imagensDisponiveis, true)) {
@@ -135,7 +132,6 @@ adminBreadcrumb([
             endif; ?>
         </div>
       <?php endforeach; ?>
-      <div class="col-12 col-md-6"><label class="form-label" for="nova_categoria">Nova categoria</label><input class="form-control" id="nova_categoria" name="nova_categoria" value="<?= e(adminValor($valores, 'nova_categoria')) ?>" placeholder="Ex.: Bem-estar"><div class="form-text">Preencha para adicionar esta categoria ao serviço.</div></div>
       <?php if ($imagensDisponiveis !== []) : ?>
         <fieldset class="col-12">
           <legend class="h6">Escolher imagem existente</legend>
