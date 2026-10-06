@@ -6,6 +6,9 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/limites.php';
 require_once __DIR__ . '/mailer.php';
+require_once __DIR__ . '/errors.php';
+
+configurarTratamentoErros();
 
 const CODIGO_2FA_VALIDADE_SEG = 60;
 const CODIGO_2FA_MAX_TENTATIVAS = 5;

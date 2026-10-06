@@ -1,0 +1,1 @@
+<?php http_response_code(403); ?><!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Acesso negado — Reiki Ana</title></head><body><main><h1>Acesso negado</h1><p>Você não tem permissão para acessar este recurso.</p><a href="/">Voltar ao início</a></main></body></html>
