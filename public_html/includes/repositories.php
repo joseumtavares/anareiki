@@ -17,6 +17,13 @@ function listarServicosAdmin(PDO $pdo): array
     return $servicos;
 }
 
+/** @return list<string> */
+function listarCategoriasServicos(PDO $pdo): array
+{
+    $stmt = $pdo->query('SELECT DISTINCT categoria FROM servicos WHERE categoria <> "" ORDER BY categoria ASC');
+    return normalizarCategoriasServico(array_map('strval', $stmt->fetchAll(PDO::FETCH_COLUMN)));
+}
+
 /** @return array<string, mixed>|null */
 function obterServicoAdmin(PDO $pdo, string $id): ?array
 {

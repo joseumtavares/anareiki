@@ -11,6 +11,7 @@ require_once __DIR__ . '/../includes/layout/admin.php';
 requireAdmin();
 $pdo = db();
 $imagensDisponiveis = listarImagensUpload('servicos');
+$categorias = listarCategoriasServicos($pdo);
 $erros = [];
 $valores = [];
 
@@ -51,6 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } else {
         $valores = $_POST;
+        if (trim((string) ($valores['nova_categoria'] ?? '')) !== '') {
+            $valores['categoria'] = trim((string) $valores['nova_categoria']);
+        }
         if (($valores['imagem_existente'] ?? '') !== '') {
             $imagemEscolhida = (string) $valores['imagem_existente'];
             if (in_array($imagemEscolhida, $imagensDisponiveis, true)) {
@@ -110,12 +114,28 @@ adminBreadcrumb([
       <?php foreach ([['nome', 'Nome', 'text'], ['categoria', 'Categoria', 'text'], ['duracao_min', 'Duração (minutos)', 'number'], ['preco', 'Preço (opcional)', 'number'], ['ordem', 'Ordem', 'number'], ['icone', 'Ícone', 'text'], ['cor', 'Cor', 'text'], ['tag', 'Tag', 'text']] as [$campo, $rotulo, $tipo]) : ?>
         <div class="col-12 col-md-<?= in_array($campo, ['nome', 'categoria'], true) ? '6' : '4' ?>">
           <label class="form-label" for="<?= e($campo) ?>"><?= e($rotulo) ?></label>
-          <input class="form-control<?= adminErro($erros, $campo) !== null ? ' is-invalid' : '' ?>" type="<?= e($tipo) ?>" id="<?= e($campo) ?>" name="<?= e($campo) ?>" value="<?= e(adminValor($valores, $campo)) ?>">
+          <?php if ($campo === 'categoria') : ?>
+            <select class="form-select<?= adminErro($erros, $campo) !== null ? ' is-invalid' : '' ?>" id="categoria" name="categoria">
+              <option value="">Selecione uma categoria</option>
+              <?php foreach ($categorias as $categoria) : ?><option value="<?= e($categoria) ?>" <?= adminValor($valores, 'categoria') === $categoria ? 'selected' : '' ?>><?= e($categoria) ?></option><?php endforeach; ?>
+              <?php if (adminValor($valores, 'categoria') !== '' && !in_array(adminValor($valores, 'categoria'), $categorias, true)) : ?><option selected value="<?= e(adminValor($valores, 'categoria')) ?>"><?= e(adminValor($valores, 'categoria')) ?></option><?php endif; ?>
+            </select>
+            <div class="form-text">Para criar uma categoria, use o campo abaixo.</div>
+          <?php elseif ($campo === 'icone') : ?>
+            <select class="form-select" id="icone" name="icone"><option value="">Sem ícone</option><?php foreach (opcoesIconeServico() as $icone) : ?><option value="<?= e($icone) ?>" <?= adminValor($valores, 'icone') === $icone ? 'selected' : '' ?>><?= e($icone) ?></option><?php endforeach; ?></select>
+          <?php elseif ($campo === 'cor') : ?>
+            <div class="d-flex flex-wrap gap-2"><?php foreach (opcoesCorServico() as $cor) : ?><label class="border rounded p-2"><input type="radio" name="cor" value="<?= e($cor) ?>" <?= adminValor($valores, 'cor') === $cor ? 'checked' : '' ?>> <span class="badge text-bg-<?= e($cor === 'purple' ? 'secondary' : 'light') ?>"><?= e($cor) ?></span></label><?php endforeach; ?></div>
+          <?php elseif ($campo === 'tag') : ?>
+            <input class="form-control" list="tags-servico" type="text" id="tag" name="tag" value="<?= e(adminValor($valores, 'tag')) ?>"><datalist id="tags-servico"><?php foreach (exemplosTagServico() as $tag) : ?><option value="<?= e($tag) ?>"><?php endforeach; ?></datalist>
+          <?php else : ?>
+            <input class="form-control<?= adminErro($erros, $campo) !== null ? ' is-invalid' : '' ?>" type="<?= e($tipo) ?>" id="<?= e($campo) ?>" name="<?= e($campo) ?>" value="<?= e(adminValor($valores, $campo)) ?>">
+          <?php endif; ?>
             <?php if (adminErro($erros, $campo) !== null) :
                 ?><div class="invalid-feedback"><?= e((string) adminErro($erros, $campo)) ?></div><?php
             endif; ?>
         </div>
       <?php endforeach; ?>
+      <div class="col-12 col-md-6"><label class="form-label" for="nova_categoria">Nova categoria</label><input class="form-control" id="nova_categoria" name="nova_categoria" value="<?= e(adminValor($valores, 'nova_categoria')) ?>" placeholder="Ex.: Bem-estar"><div class="form-text">Preencha para adicionar esta categoria ao serviço.</div></div>
       <?php if ($imagensDisponiveis !== []) : ?>
         <fieldset class="col-12">
           <legend class="h6">Escolher imagem existente</legend>
