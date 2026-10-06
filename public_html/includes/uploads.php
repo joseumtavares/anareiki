@@ -4,6 +4,25 @@ declare(strict_types=1);
 
 const ADMIN_UPLOAD_MAX_BYTES = 5242880;
 
+/** @return list<string> */
+function listarImagensUpload(string $categoria, ?string $baseDir = null): array
+{
+    if (!in_array($categoria, ['servicos', 'profissionais'], true)) {
+        return [];
+    }
+    $diretorio = ($baseDir ?? dirname(__DIR__) . '/uploads') . DIRECTORY_SEPARATOR . $categoria;
+    $arquivos = glob($diretorio . DIRECTORY_SEPARATOR . '*.{jpg,jpeg,png,webp}', GLOB_BRACE) ?: [];
+    $resultado = [];
+    foreach ($arquivos as $arquivo) {
+        $nome = basename($arquivo);
+        if (preg_match('/^[a-f0-9]{32}\.(?:jpg|jpeg|png|webp)$/', $nome) === 1 || ($baseDir !== null && @getimagesize($arquivo) !== false)) {
+            $resultado[] = '/uploads/' . $categoria . '/' . $nome;
+        }
+    }
+    sort($resultado);
+    return $resultado;
+}
+
 /** @param array<string, mixed> $arquivo */
 function salvarUploadImagem(array $arquivo, string $categoria, ?string $baseDir = null): string
 {

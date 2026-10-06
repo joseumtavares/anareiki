@@ -10,6 +10,7 @@ require_once __DIR__ . '/../includes/layout/admin.php';
 
 requireAdmin();
 $pdo = db();
+$imagensDisponiveis = listarImagensUpload('servicos');
 $erros = [];
 $valores = [];
 
@@ -36,6 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } else {
         $valores = $_POST;
+        if (($valores['imagem_existente'] ?? '') !== '') {
+            $imagemEscolhida = (string) $valores['imagem_existente'];
+            if (in_array($imagemEscolhida, $imagensDisponiveis, true)) {
+                $valores['imagem_url'] = $imagemEscolhida;
+            }
+        }
         if (isset($_FILES['imagem_upload']) && ($_FILES['imagem_upload']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
             try {
                 $valores['imagem_url'] = salvarUploadImagem($_FILES['imagem_upload'], 'servicos');
@@ -95,6 +102,21 @@ adminBreadcrumb([
             endif; ?>
         </div>
       <?php endforeach; ?>
+      <?php if ($imagensDisponiveis !== []) : ?>
+        <fieldset class="col-12">
+          <legend class="h6">Escolher imagem existente</legend>
+          <div class="row g-3">
+            <?php foreach ($imagensDisponiveis as $imagem) : ?>
+              <div class="col-6 col-sm-4 col-md-3">
+                <label class="card p-2 h-100">
+                  <img class="img-fluid rounded" src="<?= e($imagem) ?>" alt="Miniatura disponível" loading="lazy" style="aspect-ratio:1;object-fit:cover">
+                  <span class="form-check mt-2"><input class="form-check-input" type="radio" name="imagem_existente" value="<?= e($imagem) ?>" <?= adminValor($valores, 'imagem_url') === $imagem ? 'checked' : '' ?>> Usar esta imagem</span>
+                </label>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </fieldset>
+      <?php endif; ?>
       <div class="col-12 col-md-6">
         <label class="form-label" for="imagem_upload">Imagem do serviço</label>
         <input class="form-control<?= adminErro($erros, 'imagem_upload') !== null ? ' is-invalid' : '' ?>" type="file" id="imagem_upload" name="imagem_upload" accept="image/jpeg,image/png,image/webp">
