@@ -14,6 +14,30 @@ if (is_file($slotsFile)) {
 
 final class AgendamentoTest extends TestCase
 {
+    public function test_grava_fim_arredondado_conforme_intervalo_do_profissional(): void
+    {
+        $this->pdo->exec('CREATE TABLE disponibilidade_datas (
+            profissional_id TEXT, data TEXT, horarios TEXT,
+            PRIMARY KEY (profissional_id, data))');
+        foreach ([30 => '10:30', 60 => '11:00'] as $intervalo => $fimEsperado) {
+            $data = $intervalo === 30 ? '2030-10-09' : '2030-10-10';
+            salvarDisponibilidadeData($this->pdo, self::ANA_ID, $data, ['09:00', '10:00'], $intervalo);
+            $id = criarAgendamento(
+                $this->pdo,
+                self::SERVICO_ID,
+                self::ANA_ID,
+                $data,
+                '09:00',
+                75,
+                'Cliente',
+                '48999999999'
+            );
+            $stmt = $this->pdo->prepare('SELECT hora_fim FROM agendamentos WHERE id = ?');
+            $stmt->execute([$id]);
+            self::assertSame($fimEsperado, $stmt->fetchColumn());
+        }
+    }
+
     private PDO $pdo;
 
     private const ANA_ID = '01a0db02-f800-76df-a6eb-97a169b3083f';

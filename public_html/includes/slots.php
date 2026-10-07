@@ -17,6 +17,9 @@ function obterSlotsDisponiveis(
     int $duracaoMin
 ): array {
     $diaSemana = (int) date('w', strtotime($data));
+    $config = obterConfiguracaoDisponibilidadeData($pdo, $profissionalId, $data);
+    $passo = $config['intervalo'] ?? $duracaoMin;
+    $duracaoMin = duracaoReservaData($pdo, $profissionalId, $data, $duracaoMin);
 
     $faixas = obterFaixasDisponibilidadeData($pdo, $profissionalId, $data)
         ?? obterDisponibilidadeDia($pdo, $profissionalId, $diaSemana);
@@ -50,7 +53,7 @@ function obterSlotsDisponiveis(
             if (!$colide) {
                 $slots[] = date('H:i', $cursor);
             }
-            $cursor += $duracaoMin * 60;
+            $cursor += $passo * 60;
         }
     }
 

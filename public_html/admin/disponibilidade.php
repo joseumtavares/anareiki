@@ -28,7 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ) {
             throw new InvalidArgumentException('Selecione uma data e horários válidos.');
         }
-        salvarDisponibilidadeData($pdo, $profissionalId, $data, array_values($horarios));
+        $intervalo = filter_var($_POST['intervalo'] ?? 30, FILTER_VALIDATE_INT);
+        if ($intervalo === false) {
+            throw new InvalidArgumentException('Escolha um intervalo válido.');
+        }
+        salvarDisponibilidadeData($pdo, $profissionalId, $data, array_values($horarios), $intervalo);
         adminFlash($horarios === [] ? 'Dia bloqueado para novos agendamentos.' : 'Horários do dia publicados.');
         redirecionar('/admin/disponibilidade.php?profissional=' . urlencode($profissionalId));
     } catch (InvalidArgumentException $excecao) {
@@ -44,7 +48,7 @@ if ($profissional !== null) {
             WHERE profissional_id = ? AND data >= ? ORDER BY data');
         $stmt->execute([$profissionalId, date('Y-m-d')]);
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $item) {
-            $datas[$item['data']] = json_decode($item['horarios'], true, 512, JSON_THROW_ON_ERROR);
+            $datas[$item['data']] = decodificarDisponibilidadeData($item['horarios']);
         }
     } catch (PDOException $excecao) {
         if ((string) $excecao->getCode() !== '42S02') {
@@ -104,7 +108,12 @@ if ($flash !== null) {
       <input type="hidden" name="profissional_id" value="<?= e($profissionalId) ?>">
       <input type="hidden" name="data" data-selected-date>
       <h2 class="h5" data-day-title>Selecione um dia</h2>
-      <p class="small">Cada horário representa 30 minutos. Marque intervalos consecutivos para serviços mais longos.</p>
+      <label class="form-label" for="intervalo">Intervalo dos agendamentos</label>
+      <select id="intervalo" name="intervalo" class="form-select mb-3" data-slot-interval disabled>
+        <option value="30">30 minutos</option>
+        <option value="60">60 minutos</option>
+      </select>
+      <p class="small">Marque blocos consecutivos. A duração reservada será arredondada para cobrir o serviço.</p>
       <p data-day-message role="status"></p>
       <div class="availability-hours" data-day-hours></div>
       <button type="button" class="btn btn-outline-danger mt-3" data-block-day disabled>Bloquear dia inteiro</button>

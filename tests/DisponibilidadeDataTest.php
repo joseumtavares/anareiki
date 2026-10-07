@@ -54,4 +54,24 @@ final class DisponibilidadeDataTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         salvarDisponibilidadeData($this->pdo, 'p', '2030-10-09', ['25:00']);
     }
+
+    public function test_arredonda_duracao_e_oferece_apenas_blocos_consecutivos(): void
+    {
+        salvarDisponibilidadeData($this->pdo, 'p', '2030-10-09', ['09:00', '09:30', '10:00'], 30);
+        self::assertSame(60, duracaoReservaData($this->pdo, 'p', '2030-10-09', 45));
+        self::assertSame(90, duracaoReservaData($this->pdo, 'p', '2030-10-09', 75));
+        self::assertSame(['09:00', '09:30'], obterSlotsDisponiveis($this->pdo, 'p', '2030-10-09', 45));
+        self::assertSame(['09:00'], obterSlotsDisponiveis($this->pdo, 'p', '2030-10-09', 75));
+        salvarDisponibilidadeData($this->pdo, 'p', '2030-10-09', ['09:00', '10:00'], 60);
+        self::assertSame(60, duracaoReservaData($this->pdo, 'p', '2030-10-09', 45));
+        self::assertSame(120, duracaoReservaData($this->pdo, 'p', '2030-10-09', 75));
+        self::assertSame(['09:00', '10:00'], obterSlotsDisponiveis($this->pdo, 'p', '2030-10-09', 45));
+        self::assertSame(['09:00'], obterSlotsDisponiveis($this->pdo, 'p', '2030-10-09', 75));
+    }
+
+    public function test_intervalo_invalido_e_rejeitado(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        salvarDisponibilidadeData($this->pdo, 'p', '2030-10-09', ['09:00'], 45);
+    }
 }

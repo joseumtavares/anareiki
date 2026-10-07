@@ -5,7 +5,13 @@ Implementação autorizada em 07/10/2026 na branch fase-5-painel-admin.
 Aplicar sql/migrations/003_disponibilidade_datas.sql no banco antes de utilizar o calendário.
 A migração adiciona disponibilidade_datas sem modificar reservas nem regras semanais existentes.
 
-Um clique seleciona a data em verde e apresenta 48 intervalos de 30 minutos.
+Um clique seleciona a data em verde e apresenta intervalos selecionáveis.
+O padrão é 30 minutos, com opção de 60 minutos por data.
+Ao trocar o intervalo, os horários selecionados são limpos para evitar ampliar a disponibilidade sem confirmação.
+Serviços reservam blocos consecutivos suficientes: 45 minutos ocupam 60;
+75 minutos ocupam 90 em blocos de 30 ou 120 em blocos de 60.
+O horário final persistido usa o tempo arredondado, preservando a duração original do serviço.
+Datas antigas permanecem em blocos de 30. A opção usa a coluna JSON existente, sem nova migração.
 Dois cliques ou o botão Bloquear dia inteiro desmarcam todos os intervalos e deixam a data vermelha.
 Salvar dia publica a seleção; a gravação exige sessão administrativa e CSRF.
 Datas passadas e horários inválidos são rejeitados pelo servidor.

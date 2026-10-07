@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/public-view.php';
+require_once __DIR__ . '/disponibilidade-data.php';
 
 /** @return list<array<string, mixed>> */
 function listarServicosAdmin(PDO $pdo): array
@@ -407,7 +408,8 @@ function criarAgendamento(
     string $clienteTelefone
 ): string {
     $id = gerarUuid();
-    $horaFim = date('H:i', strtotime($horaInicio) + $duracaoMin * 60);
+    $duracaoReserva = duracaoReservaData($pdo, $profissionalId, $data, $duracaoMin);
+    $horaFim = date('H:i', strtotime($horaInicio) + $duracaoReserva * 60);
 
     $stmt = $pdo->prepare(
         "INSERT INTO agendamentos
