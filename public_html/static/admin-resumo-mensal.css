@@ -1,0 +1,22 @@
+.resumo-mensal-grade {
+  display: grid;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.resumo-mensal-pizza {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+}
+
+.resumo-mensal-legenda {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px) {
+  .resumo-mensal-grade {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  }
+}
