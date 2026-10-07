@@ -1,29 +1,118 @@
 <?php
+
 declare(strict_types=1);
+
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/admin.php';
 require_once __DIR__ . '/../includes/repositories.php';
+require_once __DIR__ . '/../includes/disponibilidade-data.php';
 require_once __DIR__ . '/../includes/layout/admin.php';
+
 requireAdmin();
 $pdo = db();
-$profissionalId = (string) ($_GET['profissional'] ?? $_POST['profissional_id'] ?? '');
+$entrada = $_POST['profissional_id'] ?? $_GET['profissional'] ?? '';
+$profissionalId = is_string($entrada) ? $entrada : '';
 $profissional = obterProfissionalAdmin($pdo, $profissionalId);
-$erros = [];
-$valores = ['profissional_id' => $profissionalId];
+$erro = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!csrfValido($_POST['csrf_token'] ?? null)) { http_response_code(403); $erros['_geral'] = 'Sua sessão expirou.'; }
-    elseif (($_POST['acao'] ?? '') === 'excluir') { excluirDisponibilidadeAdmin($pdo, (string) $_POST['id']); adminFlash('Intervalo removido.'); redirecionar('/admin/disponibilidade.php?profissional=' . urlencode($profissionalId)); }
-    else { $valores = $_POST; $erros = validarDadosDisponibilidadeAdmin($pdo, $valores, $profissionalId, (string) ($valores['id'] ?? '') ?: null); if ($erros === []) { salvarDisponibilidadeAdmin($pdo, $valores); adminFlash('Disponibilidade salva.'); redirecionar('/admin/disponibilidade.php?profissional=' . urlencode($profissionalId)); } }
+    try {
+        if (!csrfValido($_POST['csrf_token'] ?? null)) {
+            http_response_code(403);
+            throw new InvalidArgumentException('Sua sessão expirou. Recarregue a página.');
+        }
+        $data = $_POST['data'] ?? null;
+        $horarios = $_POST['horarios'] ?? [];
+        if (
+            !is_string($data) || !is_array($horarios)
+            || count(array_filter($horarios, 'is_string')) !== count($horarios)
+        ) {
+            throw new InvalidArgumentException('Selecione uma data e horários válidos.');
+        }
+        salvarDisponibilidadeData($pdo, $profissionalId, $data, array_values($horarios));
+        adminFlash($horarios === [] ? 'Dia bloqueado para novos agendamentos.' : 'Horários do dia publicados.');
+        redirecionar('/admin/disponibilidade.php?profissional=' . urlencode($profissionalId));
+    } catch (InvalidArgumentException $excecao) {
+        $erro = $excecao->getMessage();
+    }
 }
 $profissionais = listarProfissionaisAdmin($pdo);
-$intervalos = $profissional ? listarDisponibilidadeAdmin($pdo, $profissionalId) : [];
+$datas = [];
+$migracaoPendente = false;
+if ($profissional !== null) {
+    try {
+        $stmt = $pdo->prepare('SELECT data, horarios FROM disponibilidade_datas
+            WHERE profissional_id = ? AND data >= ? ORDER BY data');
+        $stmt->execute([$profissionalId, date('Y-m-d')]);
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $item) {
+            $datas[$item['data']] = json_decode($item['horarios'], true, 512, JSON_THROW_ON_ERROR);
+        }
+    } catch (PDOException $excecao) {
+        if ((string) $excecao->getCode() !== '42S02') {
+            throw $excecao;
+        }
+        $migracaoPendente = true;
+        $erro = 'O calendário precisa da migração 003_disponibilidade_datas antes de ser utilizado.';
+    }
+}
 $flash = consumirAdminFlash();
-$dias = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 adminTopo('Disponibilidade', true);
 adminBreadcrumb([['rotulo' => 'Painel', 'url' => '/admin/'], ['rotulo' => 'Disponibilidade', 'url' => null]]);
+adminAlerta($erro);
+if ($flash !== null) {
+    adminAlerta($flash['mensagem'], $flash['tipo']);
+}
 ?>
-<div aria-live="polite"><?php if ($flash !== null) : ?><?php adminAlerta($flash['mensagem'], $flash['tipo']); ?><?php endif; ?><?php adminAlerta(adminErro($erros, '_geral')); ?></div>
-<h1 class="h3 mb-4">Disponibilidade</h1>
-<div class="card p-3 p-md-4 mb-4"><form method="get" action="/admin/disponibilidade.php"><label class="form-label" for="profissional">Profissional</label><select class="form-select" id="profissional" name="profissional" onchange="this.form.submit()"><option value="">Selecione</option><?php foreach ($profissionais as $item) : ?><option value="<?= e((string) $item['id']) ?>" <?= $profissionalId === $item['id'] ? 'selected' : '' ?>><?= e((string) $item['nome']) ?></option><?php endforeach; ?></select></form></div>
-<?php if ($profissional) : ?><div class="card p-3 p-md-4 mb-4"><h2 class="h5">Novo intervalo — <?= e((string) $profissional['nome']) ?></h2><form method="post" action="/admin/disponibilidade.php"><input type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>"><input type="hidden" name="profissional_id" value="<?= e($profissionalId) ?>"><div class="row g-3"><div class="col-md-4"><label class="form-label">Dia</label><select class="form-select" name="dia_semana"><?php foreach ($dias as $numero => $dia) : ?><option value="<?= $numero ?>"><?= e($dia) ?></option><?php endforeach; ?></select></div><div class="col-md-4"><label class="form-label">Início</label><input class="form-control" type="time" name="hora_inicio" required></div><div class="col-md-4"><label class="form-label">Fim</label><input class="form-control" type="time" name="hora_fim" required></div></div><button class="btn btn-primary mt-3">Salvar intervalo</button></form></div><div class="card p-3 p-md-4"><h2 class="h5">Intervalos cadastrados</h2><table class="table"><tbody><?php foreach ($intervalos as $intervalo) : ?><tr><td><?= e($dias[(int) $intervalo['dia_semana']]) ?></td><td><?= e((string) $intervalo['hora_inicio']) ?> — <?= e((string) $intervalo['hora_fim']) ?></td><td class="text-end"><form method="post" onsubmit="return confirm('Remover este intervalo?');"><input type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>"><input type="hidden" name="profissional_id" value="<?= e($profissionalId) ?>"><input type="hidden" name="acao" value="excluir"><input type="hidden" name="id" value="<?= e((string) $intervalo['id']) ?>"><button class="btn btn-sm btn-outline-danger">Remover</button></form></td></tr><?php endforeach; ?></tbody></table></div><?php endif; ?>
+<link rel="stylesheet" href="/static/admin-disponibilidade.css">
+<h1 class="h3 mb-4">Disponibilidade por data</h1>
+<form method="get" class="card p-4 mb-4">
+  <label class="form-label" for="profissional">Profissional</label>
+  <select class="form-select" id="profissional" name="profissional">
+    <option value="">Selecione</option>
+    <?php foreach ($profissionais as $item) : ?>
+    <option value="<?= e((string) $item['id']) ?>" <?= $profissionalId === $item['id'] ? 'selected' : '' ?>>
+        <?= e((string) $item['nome']) ?>
+    </option>
+    <?php endforeach; ?>
+  </select>
+  <div class="mt-3"><button class="btn btn-primary" type="submit">Abrir calendário</button></div>
+</form>
+<?php if ($profissional !== null && !$migracaoPendente) : ?>
+<div data-availability-calendar data-today="<?= e(date('Y-m-d')) ?>"
+     data-days="<?= e(json_encode($datas, JSON_THROW_ON_ERROR)) ?>" class="row g-4">
+  <section class="col-12 col-lg-7">
+    <div class="card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <button type="button" class="btn btn-outline-secondary" data-month-prev aria-label="Mês anterior">‹</button>
+        <h2 class="h5 mb-0" data-month-title></h2>
+        <button type="button" class="btn btn-outline-secondary" data-month-next aria-label="Próximo mês">›</button>
+      </div>
+      <p class="small">Um clique: selecionar dia disponível. Dois cliques: bloquear o dia.</p>
+      <div class="availability-grid mb-2" aria-hidden="true">
+        <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span>
+        <span>Qui</span><span>Sex</span><span>Sáb</span>
+      </div>
+      <div class="availability-grid" data-calendar-days></div>
+      <p class="small text-secondary mt-3 mb-0">
+        Verde: horários configurados. Vermelho: bloqueado.
+        Datas neutras seguem a disponibilidade semanal existente.
+      </p>
+    </div>
+  </section>
+  <section class="col-12 col-lg-5">
+    <form method="post" class="card p-4">
+      <?= csrfCampo() ?>
+      <input type="hidden" name="profissional_id" value="<?= e($profissionalId) ?>">
+      <input type="hidden" name="data" data-selected-date>
+      <h2 class="h5" data-day-title>Selecione um dia</h2>
+      <p class="small">Cada horário representa 30 minutos. Marque intervalos consecutivos para serviços mais longos.</p>
+      <p data-day-message role="status"></p>
+      <div class="availability-hours" data-day-hours></div>
+      <button type="button" class="btn btn-outline-danger mt-3" data-block-day disabled>Bloquear dia inteiro</button>
+      <button class="btn btn-primary mt-3" type="submit" data-save-day disabled>Salvar dia</button>
+      <p class="small text-secondary mt-3 mb-0">As alterações são publicadas ao salvar. Reservas existentes são preservadas.</p>
+    </form>
+  </section>
+</div>
+<script src="/static/admin-disponibilidade.js" defer></script>
+<?php endif; ?>
 <?php adminRodape();

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/repositories.php';
+require_once __DIR__ . '/disponibilidade-data.php';
 
 /**
  * Gera horários disponíveis para um profissional em uma data.
@@ -17,7 +18,8 @@ function obterSlotsDisponiveis(
 ): array {
     $diaSemana = (int) date('w', strtotime($data));
 
-    $faixas = obterDisponibilidadeDia($pdo, $profissionalId, $diaSemana);
+    $faixas = obterFaixasDisponibilidadeData($pdo, $profissionalId, $data)
+        ?? obterDisponibilidadeDia($pdo, $profissionalId, $diaSemana);
     if ($faixas === []) {
         return [];
     }
