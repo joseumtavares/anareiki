@@ -58,6 +58,7 @@ if ($flash !== null) {
     adminAlerta($flash['mensagem'], $flash['tipo']);
 }
 ?>
+<link rel="stylesheet" href="/static/admin-agendamentos.css">
 <h1 class="h3 mb-4">Agendamentos</h1>
 <form method="get" action="/admin/agendamentos.php" class="card p-4 mb-4">
   <div class="row g-3">
@@ -100,23 +101,39 @@ if ($flash !== null) {
   <?php if ($agendamentos === []) : ?>
   <p class="text-secondary mb-0">Nenhum agendamento encontrado para estes filtros.</p>
   <?php else : ?>
-  <div class="table-responsive">
-    <table class="table align-middle">
+  <div class="table-responsive agendamentos-lista">
+    <table class="table align-middle" role="table">
       <caption>Agendamentos encontrados</caption>
       <thead><tr>
-        <th scope="col">Identificador</th><th scope="col">Data e horário</th>
+        <th scope="col">Cliente / Identificação</th><th scope="col">Data e horário</th>
         <th scope="col">Serviço</th><th scope="col">Profissional</th>
         <th scope="col">Status</th><th scope="col">Ações</th>
       </tr></thead>
       <tbody>
         <?php foreach ($agendamentos as $item) : ?>
         <tr>
-          <td><small><?= e((string) $item['id']) ?></small></td>
-          <td><?= e((string) $item['data']) ?> <?= e(substr((string) $item['hora_inicio'], 0, 5)) ?></td>
-          <td><?= e((string) $item['servico_nome']) ?></td>
-          <td><?= e((string) $item['profissional_nome']) ?></td>
-          <td><?= e($rotulos[$item['status']] ?? (string) $item['status']) ?></td>
-          <td>
+          <td data-label="Cliente / Identificação">
+            <strong class="d-block"><?= e((string) $item['cliente_nome']) ?></strong>
+            <?php $whatsapp = linkWhatsAppCliente((string) $item['cliente_telefone']); ?>
+            <?php if ($whatsapp !== null) : ?>
+            <a class="d-inline-block py-2" href="<?= e($whatsapp) ?>" target="_blank"
+               rel="noopener noreferrer" referrerpolicy="no-referrer">
+                <?= e((string) $item['cliente_telefone']) ?> — WhatsApp
+              <span class="visually-hidden">(abre em nova aba)</span>
+            </a>
+            <?php else : ?>
+            <span class="d-block"><?= e((string) $item['cliente_telefone']) ?: 'Telefone não informado' ?></span>
+            <?php endif; ?>
+            <small class="d-block text-secondary">ID: <?= e((string) $item['id']) ?></small>
+          </td>
+          <td data-label="Data e horário">
+            <?= e((string) $item['data']) ?> <?= e(substr((string) $item['hora_inicio'], 0, 5)) ?>
+          </td>
+          <td data-label="Serviço"><?= e((string) $item['servico_nome']) ?></td>
+          <td data-label="Profissional"><?= e((string) $item['profissional_nome']) ?></td>
+          <td data-label="Status"><?= e($rotulos[$item['status']] ?? (string) $item['status']) ?></td>
+          <td data-label="Ações">
+            <div class="agendamentos-acoes">
             <?php foreach (destinosStatusAgendamento((string) $item['status']) as $destino) : ?>
             <form method="post" class="d-inline">
                 <?= csrfCampo() ?>
@@ -129,6 +146,7 @@ if ($flash !== null) {
             <?php if (destinosStatusAgendamento((string) $item['status']) === []) : ?>
             <span class="text-secondary">Finalizado</span>
             <?php endif; ?>
+            </div>
           </td>
         </tr>
         <?php endforeach; ?>

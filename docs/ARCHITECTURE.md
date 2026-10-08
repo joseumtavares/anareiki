@@ -248,7 +248,7 @@ Site público  → só dados públicos (serviços ativos, profissionais ativos, 
 Admin         → dados públicos + dados de clientes (nome/telefone dos agendamentos)
 ```
 
-Telefone e e-mail de cliente são dados pessoais: nunca exibidos em página pública, nunca em URL/query, nunca logados. Ver `RULES.md` §10.
+Telefone e e-mail de cliente são dados pessoais: nunca exibidos em página pública nem logados. Exceção aprovada na Fase 5: o admin autenticado pode abrir o WhatsApp via URL `https://wa.me/NUMERO` do cliente; o telefone só é enviado ao destino ao abrir o link. Não incluir contatos em filtros/query strings internos. Ver `RULES.md` §10.
 
 ---
 
@@ -284,3 +284,16 @@ Telefone e e-mail de cliente são dados pessoais: nunca exibidos em página púb
 6. Testar: home, agendamento ponta a ponta, login admin, CRUD.
 
 Sem passo de build: são arquivos PHP/CSS/JS servidos diretamente. O ESLint e os testes rodam localmente antes do upload (ver `RULES.md` §11), não no servidor.
+
+## 13. Ampliações da Fase 5 — 2026-10-07
+
+Correções de fechamento: `categorias_servicos(nome)` é cadastro independente adicionado pela migration 004; repositórios administrativos foram extraídos para `servicos-repository.php`, `profissionais-repository.php` e `disponibilidade-repository.php`, carregados pelo arquivo compatível `repositories.php`. O menu/confirmacões usa JS nativo local `admin-ui.js`, sem bundle remoto. Logs agora omitem mensagem bruta da exceção. Ver `CORRECOES-FASE-5.md` para gates e revalidação visual pendente.
+
+- Design: padrão aprovado `public_html/assets/img/{logo,icons,backgrounds,static}/`; ativos em `static/` permanecem legados até migração da Fase 6.
+- Conteúdo administrativo: `public_html/uploads/{servicos,profissionais}/`, nomes aleatórios, JPG/PNG/WEBP até 5 MB. Não confundir com ativos versionados de design; uploads exigem backup e preservação no deploy.
+- Calendário: `disponibilidade_datas`, chave profissional/data, TEXT contendo JSON `{intervalo, horarios}`. Migration `003`; leitura de listas legadas como 30 min; regras semanais usadas somente em datas sem override. Intervalos 30/60 e duração arredondada reservam blocos contíguos. Ver [calendário](DISPONIBILIDADE-CALENDARIO.md).
+- Indicadores: consulta mensal agregada em `resumo-mensal-admin.php`; pizza SVG no servidor, sem dependência de JS. Quantidades não canceladas e estimativa de receita somente de concluídos, calculada pelo preço atual (não histórico financeiro).
+- Diagnóstico: páginas 403/404/500 e handler com request ID. Logs dependem de configuração PHP/Apache privada; sanitização ainda pendente.
+- Somente papel `admin`; profissionais são entidades administradas, não usuários com credenciais próprias.
+
+Estado técnico e divergências da implementação: [revisão da Fase 5](REVISAO-FASE-5.md). Não considerar esses padrões integralmente validados enquanto R1–R6 estiverem abertos.

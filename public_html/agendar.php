@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $erro = 'Este horário acabou de ser reservado. '
                         . 'Escolha outro horário.';
                 } else {
-                    error_log('Erro ao criar agendamento: ' . $e->getMessage());
+                    registrarErroAplicacao($e, gerarRequestId());
                     http_response_code(500);
                     $erro = 'Erro interno. Tente novamente.';
                 }
@@ -103,7 +103,7 @@ try {
     $pdo = db();
     $servicos = listarServicosPublicos($pdo);
 } catch (Throwable $e) {
-    error_log('Falha ao carregar serviços: ' . $e->getMessage());
+    registrarErroAplicacao($e, gerarRequestId());
 }
 
 $fontesUrl = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400'

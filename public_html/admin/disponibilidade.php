@@ -33,7 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new InvalidArgumentException('Escolha um intervalo válido.');
         }
         salvarDisponibilidadeData($pdo, $profissionalId, $data, array_values($horarios), $intervalo);
-        adminFlash($horarios === [] ? 'Dia bloqueado para novos agendamentos.' : 'Horários do dia publicados.');
+        adminFlash($horarios === [] ? 'Dia bloqueado para novos agendamentos.' :
+        'Horários do dia publicados.');
         redirecionar('/admin/disponibilidade.php?profissional=' . urlencode($profissionalId));
     } catch (InvalidArgumentException $excecao) {
         $erro = $excecao->getMessage();
@@ -86,9 +87,11 @@ if ($flash !== null) {
   <section class="col-12 col-lg-7">
     <div class="card p-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <button type="button" class="btn btn-outline-secondary" data-month-prev aria-label="Mês anterior">‹</button>
+        <button type="button" class="btn btn-outline-secondary" data-month-prev aria-label="Mês anterior">
+    ‹</button>
         <h2 class="h5 mb-0" data-month-title></h2>
-        <button type="button" class="btn btn-outline-secondary" data-month-next aria-label="Próximo mês">›</button>
+        <button type="button" class="btn btn-outline-secondary" data-month-next aria-label="Próximo mês">
+    ›</button>
       </div>
       <p class="small">Um clique: selecionar dia disponível. Dois cliques: bloquear o dia.</p>
       <div class="availability-grid mb-2" aria-hidden="true">
@@ -113,12 +116,15 @@ if ($flash !== null) {
         <option value="30">30 minutos</option>
         <option value="60">60 minutos</option>
       </select>
-      <p class="small">Marque blocos consecutivos. A duração reservada será arredondada para cobrir o serviço.</p>
+      <p class="small">Marque blocos consecutivos. A duração reservada será arredondada para cobrir o
+    serviço.</p>
       <p data-day-message role="status"></p>
       <div class="availability-hours" data-day-hours></div>
-      <button type="button" class="btn btn-outline-danger mt-3" data-block-day disabled>Bloquear dia inteiro</button>
+      <button type="button" class="btn btn-outline-danger mt-3" data-block-day disabled>Bloquear dia
+    inteiro</button>
       <button class="btn btn-primary mt-3" type="submit" data-save-day disabled>Salvar dia</button>
-      <p class="small text-secondary mt-3 mb-0">As alterações são publicadas ao salvar. Reservas existentes são preservadas.</p>
+      <p class="small text-secondary mt-3 mb-0">As alterações são publicadas ao salvar. Reservas existentes
+    são preservadas.</p>
     </form>
   </section>
 </div>

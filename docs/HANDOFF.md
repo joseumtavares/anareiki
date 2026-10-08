@@ -2,9 +2,28 @@
 
 Este documento e atualizado ao encerrar cada sessao. Ele e a fonte de transicao entre sessoes e deve ser lido antes de iniciar uma nova etapa do `PLANO_MESTRE_ANAREIKI.md`.
 
-## Encerramento da Fase 4 — 2026-10-01
+## Estado atual — revisão da Fase 5 em 2026-10-07
 
-- **Branch:** `main` (Jose criará branch `fase-4-agendamento` para commit/merge).
+**Aceite final:** Jose aprovou a entrega corrigida e autorizou commit, merge em `main` e push. Fase 5 encerrada funcionalmente; gates reexecutados antes da integração: 106 testes PHP/512 asserções, 2 testes Node, PHPStan, PHPCS, ESLint, limite de linhas e diff check aprovados. Não houve inspeção automatizada nova no navegador; aceite é do usuário. Uploads reais e arquivos locais de ferramentas não integram a entrega. Fase 6 não iniciada; próxima ação proposta é inventariar imagens externas e referências antes de migrar ativos de design para `assets/img/`. Os registros seguintes são históricos.
+
+**Atualização de execução:** Jose autorizou as correções R1–R6. Implementadas com gates completos aprovados (106 testes PHPUnit/512 asserções, 2 testes Node, PHPStan, PHPCS, ESLint, limite de linhas e diff check). Migration 004 de categorias aplicada somente localmente. Revisão independente encontrou erro de upload sobrescrito, também corrigido. Ver [CORRECOES-FASE-5.md](CORRECOES-FASE-5.md). Próxima ação: Jose repetir testes visuais dos fluxos corrigidos; não iniciar Fase 6 ou merge/push automaticamente. Os itens abaixo preservam o diagnóstico anterior.
+
+- **Branch/workspace:** `fase-5-painel-admin`, execução nativa em `C:\Users\Jose Tavares\anareiki`; base funcional `03b5b11`, último commit observado `96fc741`.
+- **Aceite:** Jose informou testes visuais concluídos e aprovados. Não houve nova validação automatizada de navegador nesta revisão.
+- **Estado:** implementação entregue com ampliações, mas fechamento técnico pendente. O registro antigo abaixo é histórico e não substitui este estado.
+- **Documentação:** [REVISAO-FASE-5.md](REVISAO-FASE-5.md) inventaria entregas fora da proposta original, regras, migration local, limitações e achados R1–R6. Spec, Plano Mestre, calendário, arquitetura, API, regras e design receberam atualização correspondente.
+- **Gates nesta revisão:** PHPUnit 99 testes/461 asserções e PHPStan aprovados; ESLint sem erros; PHPCS completo reprovado (69 erros/63 avisos); limite de linhas reprovado (`repositories.php`: 496/350); diff check inicial apontou linha vazia no EOF deste handoff.
+- **Pendências obrigatórias:** integração da foto em `/uploads/profissionais/`; fluxo de cadastro de categorias; formulários aninhados da galeria; sanitização de logs; PHPCS/limite de linhas; Bootstrap CDN bloqueado pela CSP. Evidências e sugestões no relatório.
+- **Dados de clientes:** atualização aprovada da tabela administrativa agora mostra nome e telefone com WhatsApp, mantendo ID secundário. O registro histórico “nenhum dado pessoal na tabela” não vale para esta versão. Sem envio automático ou exposição pública dos contatos.
+- **Migration:** `003_disponibilidade_datas.sql` aplicada localmente na etapa anterior, com funcionamento confirmado por Jose; não aplicada em produção por esta revisão.
+- **Git:** alterações locais das últimas melhorias e arquivos do usuário foram preservados. Nenhum commit, merge, push ou limpeza de branch/workspace foi feito nesta revisão.
+- **Skills:** revisão de código e documentação/decisões; fluxo de encerramento inspecionado, mas não iniciado diante de pendências técnicas.
+- **Próxima etapa proposta:** correções R1–R6 em fatias, com testes de integração e revalidação visual dos fluxos afetados. Não iniciar Fase 6 antes do fechamento técnico e aprovação do Jose.
+- **Contexto a ler:** este estado, Plano Mestre, relatório de revisão e spec da Fase 5. Primeira ação: reproduzir a rejeição de foto upload no validador e adicionar teste de regressão. Esta revisão não autorizou novas mudanças de produto ou integração Git.
+
+## Encerramento da Fase 4 — aceite manual confirmado em 2026-10-05
+
+- **Integração:** implementação no commit `3afe670`, já ancestral de `main`; ajustes complementares no commit `03b5b11`.
 - **Entrega:** motor de agendamento completo — geração de slots, calendário vanilla JS, endpoints JSON, página de agendamento com validação server-side e confirmação via WhatsApp.
 - **Arquivos criados:** `public_html/agendar.php`, `public_html/confirmacao-agendamento.php`, `public_html/api/slots.php`, `public_html/api/profissionais.php`, `public_html/includes/slots.php`, `public_html/static/calendar.js`, `public_html/static/calendar.css`, `public_html/static/agendar.js`, `public_html/static/agendar.css`, `public_html/static/confirmacao.css`, `tests/SlotsTest.php`, `tests/AgendamentoTest.php`.
 - **Arquivos modificados:** `public_html/includes/repositories.php` (6 funções novas), `eslint.config.js` (CustomEvent global).
@@ -12,8 +31,9 @@ Este documento e atualizado ao encerrar cada sessao. Ele e a fonte de transicao 
 - **Segurança:** CSRF em todo POST, rate limit 10/min por IP em api/slots.php, índice único contra overbooking (409), revalidação server-side de slots, prepared statements em toda query.
 - **Gates:** PHPUnit 51/51 (347 asserções); PHPCS 0 erros nos arquivos da Fase 4; ESLint limpo; check:lines todos abaixo de 350 linhas.
 - **Rulings:** (1) `validarSlotDisponivel()` em repositories.php em vez de slots.php — segue padrão existente; (2) CustomEvent adicionado aos globals do ESLint — necessário para flat config.
-- **Validação manual pendente:** Jose deve testar fluxo completo em desktop e mobile (360px+), incluindo edge cases (data passada, CSRF inválido, overbooking, rate limit).
-- **Próxima etapa:** Fase 5 — painel admin (CRUD de serviços, profissionais, disponibilidade e agendamentos).
+- **Validação manual:** Jose confirmou em 05/10/2026 que efetuou e aprovou o fluxo completo em desktop e mobile (360px+) e os casos de borda: data passada, CSRF inválido, overbooking e rate limit.
+- **Status:** Fase 4 concluída após validação manual; gates automatizados registrados acima.
+- **Próxima etapa:** preparar proposta de arquitetura para a Fase 5 — painel admin (CRUD de serviços, profissionais, disponibilidade e gestão de status dos agendamentos). Não iniciar implementação antes da aprovação da proposta e revisão técnica exigidas pelo Plano Mestre §4.
 
 ## Atualizacao de pendencia transversal — 2026-10-01
 
@@ -193,5 +213,15 @@ Iniciar a Fase 3 na worktree `fase-3-site-dinamico`, partindo de `main` apos a i
 - **Segurança aplicável:** saída de banco continua escapada por `htmlPublico`; imagens de serviço somente aparecem após `urlImagemServico`; repositório existente usa colunas públicas explícitas e filtra `ativo = 1`. Não houve formulário, escrita, mudança de schema, autenticação, upload ou leitura de dado pessoal nesta tarefa.
 - **Limitações verificadas:** ativos de CSS/JS ainda não foram copiados para `public_html/static/`; conferência visual desktop/mobile no Apache fica para a Task 4. Nenhuma imagem ou perfil fictício foi adicionado. A pendência de rotação da senha SMTP antes do deploy continua aberta.
 - **Skills aplicadas:** `using-superpowers`, `brainstorming` (escopo/spec/handoff aprovados previamente), `test-driven-development`, `incremental-implementation`, `php-best-practices` e `verification-before-completion`.
-- **Próxima etapa:** Task 4 — copiar os seis CSS e `app.js` para `public_html/static/` sem alterar as origens nem `admin-auth.js`, verificar correspondência dos arquivos e validar a home no Apache em desktop e mobile. A Task 5 atualizará a arquitetura e reunirá documentação, revisão e testes manuais finais.
+- **Status:** Fase 4 concluída após validação manual; gates automatizados registrados acima.
+- **Próxima etapa:** preparar proposta de arquitetura para a Fase 5 — painel admin (CRUD de serviços, profissionais, disponibilidade e gestão de status dos agendamentos). Não iniciar implementação antes da aprovação da proposta e revisão técnica exigidas pelo Plano Mestre §4.
 - **Primeira ação sugerida:** conferir o estado atual das origens e dos arquivos em `public_html/static/`, fazer apenas as cópias listadas no plano, e então executar a verificação visual/local.
+# Atualização — 2026-10-07: módulo de agendamentos da Fase 5
+
+- Branch: `fase-5-painel-admin`; execução nativa autorizada por Jose.
+- Criados `public_html/admin/agendamentos.php`, `public_html/includes/agendamentos-admin.php` e `tests/AgendamentoAdminTest.php`.
+- Listagem responsiva com filtros de período, status e profissional; nenhum dado pessoal do cliente na tabela.
+- Transições permitidas: pendente para confirmado/cancelado; confirmado para concluído/cancelado. Estados finais sem ações.
+- POST exige autenticação e CSRF; atualização condicional de status em transação bloqueia requisições desatualizadas.
+- Verificação: PHPUnit 87 testes/423 asserções; PHPCS dos três arquivos novos aprovado; sintaxe e diff check aprovados.
+- Estado histórico: o aceite visual foi posteriormente informado por Jose; consultar o estado atual no início deste documento para a revisão técnica e pendências.

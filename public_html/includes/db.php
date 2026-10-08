@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/errors.php';
+
 /** @return array<string, mixed> */
 function config(): array
 {
@@ -31,7 +33,7 @@ function db(): PDO
                 ]
             );
         } catch (PDOException $e) {
-            error_log('Falha de conexão com o banco: ' . $e->getMessage());
+            registrarErroAplicacao($e, gerarRequestId());
             throw new RuntimeException('Serviço temporariamente indisponível.', 0, $e);
         }
         // Mesmo fuso do PHP: NOW()/CURRENT_TIMESTAMP batem com DateTime (Brasil sem horário de verão).

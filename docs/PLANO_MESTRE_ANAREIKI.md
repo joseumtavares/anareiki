@@ -1,7 +1,7 @@
 # Plano Mestre — Reiki Ana (Massoterapeuta)
 
-Status: Fase 3 concluída; Fase 4 não iniciada
-Última revisão: 2026-10-01
+Status: Fase 5 concluída e aprovada por Jose; integração Git autorizada
+Ultima revisao: 2026-10-07
 
 > **Governança:** este é o documento-raiz do projeto. Ele diz **qual fase está autorizada agora** e qual o escopo aprovado. Os demais documentos (`ARCHITECTURE.md`, `API.md`, `DESIGN-SYSTEM.md`, `RULES.md`) descrevem *como* fazer; este diz *o que* e *quando*. Nenhuma fase começa sem a fase anterior concluída e aprovada.
 
@@ -65,7 +65,7 @@ A decisão do cliente (Jose) foi **evoluir para uma aplicação com backend**, a
 
 - pagamento online;
 - notificação automática por e-mail/WhatsApp na confirmação (o admin confirma manualmente) — o único e-mail do sistema é o código de 2FA do admin;
-- tabela de bloqueios/folgas de datas específicas (feriados);
+- gestão avançada de folgas/feriados (o calendário simples por data foi aprovado como ampliação da Fase 5);
 - múltiplos papéis de acesso (só existe o papel `admin`);
 - CRUD dos "pacotes" (permanecem estáticos no site até haver aprovação);
 - multi-idioma.
@@ -85,22 +85,28 @@ Cada fase só inicia após a anterior estar concluída, testada e aprovada (flux
 | 🔴 | Não iniciada | Etapa ainda não começou ou aguarda a conclusão de dependências. |
 | 🛑 | Bloqueada | Não pode avançar até resolver uma dependência externa ou risco impeditivo. |
 
-### 3.2. Estado consolidado em 01 de outubro de 2026
+### 3.2. Estado consolidado em 07 de outubro de 2026
 
 | Status | Etapa | Situação atual | Próximo portão |
 |---|---|---|---|
 | 🟢 | Fase 1 — Banco | Migração inicial `001_schema_inicial.sql`, tabela `migracoes`, schema e seed presentes; a fundação foi usada pelas etapas posteriores. | Nenhum; manter como base concluída. |
 | 🟢 | Fase 2 — Fundação PHP | Encerrada e aceita por Jose em 30/09/2026. PDO, configuração privada fora de `public_html`, sessão, login, 2FA por e-mail, CSRF, rate limit, UUID v7, PHPMailer e testes estão implementados. PHPUnit, build, ESLint, limite de linhas, PHPCS e PHPStan foram registrados como aprovados. Jose confirmou a rotação da senha SMTP em 01/10/2026. | Nenhum. |
 | 🟢 | Fase 3 — Site público dinâmico | Tasks 1–5 concluídas em 01/10/2026. Home dinâmica, documentação, gates e revisão encerrados; Jose aprovou a inspeção visual responsiva e autorizou commit, merge e push. | Encerrada; manter a home pública como base das fases seguintes. |
-| 🔴 | Fase 4 — Motor e fluxo de agendamento | Não iniciada. Inclui consulta de horários, validação de conflito no servidor e gravação de agendamento como `pendente`. | Antes de implementar, apresentar proposta/modelagem, obter aprovação de Jose e revisão técnica conforme a seção 4. |
-| 🔴 | Fase 5 — Painel admin (Bootstrap) | Não iniciada. Inclui CRUD de serviços, profissionais e disponibilidade, além da gestão de status dos agendamentos. | Aguardar os portões de fase e definir a sequência de execução com o estado da Fase 4; não implementar fora do fluxo de aprovação. |
-| 🔴 | Fase 6 — Imagens | Não iniciada. Baixar as imagens externas ainda usadas no site para `public_html/static/img/`, verificando referências e licenças/origem conforme aplicável. | Inventariar as imagens restantes após a Fase 3 e migrá-las sem quebrar o visual aprovado. |
+| 🟢 | Fase 4 — Motor e fluxo de agendamento | Implementada no commit `3afe670` e integrada em `main`; ajustes complementares em `03b5b11`. Jose confirmou em 05/10/2026 a aprovação dos testes manuais do fluxo e casos de borda registrados no handoff. | Encerrada; manter a validação server-side, CSRF, rate limit e restrição de não persistir e-mail do cliente. |
+| 🟢 | Fase 5 — Painel admin (Bootstrap) | R1–R6 corrigidos; gates completos aprovados; aceite final e commit/merge/push autorizados por Jose. Migrations 003/004 aplicadas localmente. | Encerrada; próxima fase é o inventário/migração de imagens, ainda não iniciado. |
+| 🔴 | Fase 6 — Imagens | Não iniciada. Inventariar imagens externas e migrar ativos de design para `public_html/assets/img/`, verificando referências e origem/licenças. Uploads administrativos da Fase 5 são separados em `public_html/uploads/`. | Depende do fechamento técnico da Fase 5; não remover `static/` nem arquivos existentes sem migração verificada. |
 | 🔴 | Fase 7 — Deploy Hostinger | Não iniciada. Implantar banco e aplicação no hPanel, habilitar SSL e configurar credenciais privadas. | Depende das Fases 1–6. Rotação SMTP confirmada; verificar configuração real no ambiente Hostinger. |
 | 🔴 | Fase 8 — Limpeza | Não iniciada. Remover Hono, Cloudflare, Vite e Wrangler do repositório legado. | Depende do deploy validado (Fase 7). |
 
 **Pendências transversais registradas:** (1) ampliar a cobertura de testes de concorrência das escritas atômicas do OTP antes de alterar essa persistência. A senha SMTP foi rotacionada, conforme confirmação de Jose em 01/10/2026. A validação visual automatizada do painel admin não foi realizada e deve ser considerada nas verificações aplicáveis antes do deploy.
 
-O estado acima foi consolidado a partir de `docs/HANDOFF.md`, dos arquivos presentes no repositório e do histórico publicado em `main`. A Fase 3 foi encerrada com o aceite de Jose em 01/10/2026; a Fase 4 continua não iniciada.
+O estado acima inclui a branch local `fase-5-painel-admin`, ainda não integrada a `main`, e o aceite visual informado por Jose. A Fase 3 foi encerrada em 01/10/2026 e a Fase 4 em 05/10/2026. A revisão e as ampliações da Fase 5 estão registradas em [REVISAO-FASE-5.md](REVISAO-FASE-5.md); não houve autorização de deploy nesta revisão.
+
+### 3.3. Ampliações aprovadas da Fase 5
+
+Upload, miniaturas, seleção/exclusão física de imagens sem uso; exclusão condicionada de serviços/profissionais; seletores de ícones/cores/tags e categorias; páginas de erro/logs; calendário por data e intervalos de 30/60 minutos; agendamentos em cartões no celular; nome/telefone com link WhatsApp no admin; pizza mensal e faturamento estimado somente de concluídos. A aprovação de requisitos não implica integração completa: as pendências técnicas estão no relatório de revisão.
+
+Não foram incluídos pagamento, notificações automáticas, módulo de produtos ou novo papel de profissional. O resumo usa preços atuais, sem histórico de pagamentos/preços.
 
 ---
 

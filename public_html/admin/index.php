@@ -9,6 +9,29 @@ require_once __DIR__ . '/../includes/layout/admin.php';
 require_once __DIR__ . '/../includes/resumo-mensal-admin.php';
 
 $admin = requireAdmin();
+$erroCategoria = null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!csrfValido($_POST['csrf_token'] ?? null)) {
+        http_response_code(403);
+        $erroCategoria = 'Sua sessão expirou. Recarregue a página.';
+    } else {
+        try {
+            $nome = $_POST['categoria'] ?? null;
+            if (!is_string($nome)) {
+                throw new InvalidArgumentException('Informe uma categoria válida.');
+            }
+            salvarCategoriaServico(db(), $nome);
+            adminFlash('Categoria cadastrada.');
+            redirecionar('/admin/');
+        } catch (InvalidArgumentException $erro) {
+            http_response_code(422);
+            $erroCategoria = $erro->getMessage();
+        } catch (PDOException $erro) {
+            registrarErroAplicacao($erro, gerarRequestId());
+            $erroCategoria = 'Não foi possível cadastrar. Verifique a migration 004_categorias_servicos.';
+        }
+    }
+}
 $flash = consumirAdminFlash();
 $mes = is_string($_GET['mes'] ?? null) ? $_GET['mes'] : date('Y-m');
 $resumo = null;
@@ -19,14 +42,14 @@ try {
     http_response_code(422);
     $erroResumo = $erro->getMessage();
 } catch (Throwable $erro) {
-    error_log('Falha ao carregar resumo mensal do painel: ' . $erro->getMessage());
+    registrarErroAplicacao($erro, gerarRequestId());
     $erroResumo = 'Não foi possível carregar o resumo mensal. Tente novamente mais tarde.';
 }
 $categorias = [];
 try {
     $categorias = listarCategoriasServicos(db());
 } catch (Throwable $erro) {
-    error_log('Falha ao carregar categorias do painel: ' . $erro->getMessage());
+    registrarErroAplicacao($erro, gerarRequestId());
 }
 
 adminTopo('Painel', true);
@@ -68,8 +91,18 @@ renderResumoMensalAdmin($mes, $resumo, $erroResumo);
 <div class="card p-4 mt-4">
   <div class="d-flex justify-content-between align-items-center">
     <h2 class="h5 mb-0">Categorias</h2>
-    <a class="btn btn-primary" href="/admin/servicos.php">Adicionar categoria</a>
   </div>
+  <?php adminAlerta($erroCategoria); ?>
+  <form method="post" action="/admin/" class="row g-2 align-items-end mt-2">
+    <?= csrfCampo() ?>
+    <div class="col-12 col-md-8">
+      <label for="nova-categoria" class="form-label">Nova categoria</label>
+      <input id="nova-categoria" name="categoria" class="form-control" maxlength="50" required>
+    </div>
+    <div class="col-12 col-md-4">
+      <button class="btn btn-primary" type="submit">Adicionar categoria</button>
+    </div>
+  </form>
   <p class="text-secondary mt-2 mb-2">Categorias disponíveis para os serviços:</p>
   <div class="d-flex flex-wrap gap-2"><?php foreach ($categorias as $categoria) :
         ?><span class="badge rounded-pill text-bg-light border"><?= e($categoria) ?></span><?php

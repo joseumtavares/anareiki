@@ -30,7 +30,13 @@ function urlImagemServico(?string $url): ?string
 
 function urlFotoProfissional(?string $url): ?string
 {
-    if ($url === null || !caminhoImagemLocalValido($url)) {
+    if ($url === null) {
+        return null;
+    }
+    if (preg_match('~\A/uploads/profissionais/[a-f0-9]{32}\.(?:jpg|png|webp)\z~D', $url) === 1) {
+        return $url;
+    }
+    if (!caminhoImagemLocalValido($url)) {
         return null;
     }
 

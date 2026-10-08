@@ -17,6 +17,7 @@ final class AdminCatalogOptionsTest extends TestCase
 
     public function test_categorias_sao_normalizadas_e_sem_duplicidade(): void
     {
-        self::assertSame(['Massagens', 'Terapias'], normalizarCategoriasServico([' terapias ', 'Massagens', 'Terapias', '']));
+        self::assertSame(['Massagens', 'Terapias'], normalizarCategoriasServico([' terapias ', 'Massagens',
+        'Terapias', '']));
     }
 }

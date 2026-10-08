@@ -15,7 +15,10 @@ function listarImagensUpload(string $categoria, ?string $baseDir = null): array
     $resultado = [];
     foreach ($arquivos as $arquivo) {
         $nome = basename($arquivo);
-        if (preg_match('/^[a-f0-9]{32}\.(?:jpg|jpeg|png|webp)$/', $nome) === 1 || ($baseDir !== null && @getimagesize($arquivo) !== false)) {
+        if (
+            preg_match('/^[a-f0-9]{32}\.(?:jpg|jpeg|png|webp)$/', $nome) === 1 || ($baseDir !== null &&
+            @getimagesize($arquivo) !== false)
+        ) {
             $resultado[] = '/uploads/' . $categoria . '/' . $nome;
         }
     }
@@ -25,13 +28,23 @@ function listarImagensUpload(string $categoria, ?string $baseDir = null): array
 
 function excluirUploadImagem(string $url, ?string $baseDir = null): void
 {
-    if (preg_match('~\A/uploads/(servicos|profissionais)/([a-f0-9]{32}\.(?:jpg|jpeg|png|webp))\z~', $url, $partes) !== 1) {
+    if (
+        preg_match(
+            '~\A/uploads/(servicos|profissionais)/([a-f0-9]{32}\.(?:jpg|jpeg|png|webp))\z~',
+            $url,
+            $partes
+        ) !== 1
+    ) {
         throw new InvalidArgumentException('Imagem inválida.');
     }
     $raiz = realpath($baseDir ?? dirname(__DIR__) . '/uploads');
-    $arquivo = ($baseDir ?? dirname(__DIR__) . '/uploads') . DIRECTORY_SEPARATOR . $partes[1] . DIRECTORY_SEPARATOR . $partes[2];
+    $arquivo = ($baseDir ?? dirname(__DIR__) . '/uploads') . DIRECTORY_SEPARATOR . $partes[1] .
+    DIRECTORY_SEPARATOR . $partes[2];
     $alvo = realpath($arquivo);
-    if ($raiz === false || $alvo === false || dirname($alvo) === $raiz || !str_starts_with($alvo, $raiz . DIRECTORY_SEPARATOR)) {
+    if (
+        $raiz === false || $alvo === false || dirname($alvo) === $raiz || !str_starts_with($alvo, $raiz .
+        DIRECTORY_SEPARATOR)
+    ) {
         throw new InvalidArgumentException('Arquivo fora da pasta de uploads.');
     }
     if (!unlink($alvo)) {

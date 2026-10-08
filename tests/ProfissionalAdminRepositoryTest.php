@@ -17,9 +17,11 @@ final class ProfissionalAdminRepositoryTest extends TestCase
         $this->pdo = new PDO('sqlite::memory:');
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        $this->pdo->exec('CREATE TABLE profissionais (id TEXT PRIMARY KEY, nome TEXT NOT NULL, especialidade TEXT, bio TEXT, foto_url TEXT, ativo INTEGER DEFAULT 1)');
+        $this->pdo->exec('CREATE TABLE profissionais (id TEXT PRIMARY KEY, nome TEXT NOT NULL,
+            especialidade TEXT, bio TEXT, foto_url TEXT, ativo INTEGER DEFAULT 1)');
         $this->pdo->exec('CREATE TABLE servicos (id TEXT PRIMARY KEY, nome TEXT NOT NULL, ativo INTEGER DEFAULT 1)');
-        $this->pdo->exec('CREATE TABLE profissional_servico (profissional_id TEXT, servico_id TEXT, PRIMARY KEY (profissional_id, servico_id))');
+        $this->pdo->exec('CREATE TABLE profissional_servico (profissional_id TEXT, servico_id TEXT,
+            PRIMARY KEY (profissional_id, servico_id))');
         $this->pdo->exec("INSERT INTO profissionais VALUES ('p1', 'Ana', 'Massoterapeuta', 'Bio', NULL, 1)");
         $this->pdo->exec("INSERT INTO servicos VALUES ('s1', 'Reiki', 1), ('s2', 'Massagem', 1)");
     }
@@ -31,6 +33,18 @@ final class ProfissionalAdminRepositoryTest extends TestCase
             'servicos' => ['s1', 's2'],
         ]);
         self::assertSame(['s1', 's2'], listarServicosDoProfissional($this->pdo, $id));
+    }
+
+    public function test_foto_de_upload_e_aceita_persistida_e_renderizavel(): void
+    {
+        $foto = '/uploads/profissionais/' . str_repeat('a', 32) . '.webp';
+        $dados = ['nome' => 'Bia', 'foto_url' => $foto, 'servicos' => ['s1']];
+        self::assertSame([], validarDadosProfissionalAdmin($this->pdo, $dados));
+        $id = salvarProfissionalAdmin($this->pdo, $dados);
+        self::assertSame($foto, obterProfissionalAdmin($this->pdo, $id)['foto_url']);
+        self::assertSame($foto, urlFotoProfissional($foto));
+        self::assertNull(urlFotoProfissional('/uploads/profissionais/../config.php'));
+        self::assertNull(urlFotoProfissional('/uploads/servicos/' . str_repeat('a', 32) . '.webp'));
     }
 
     public function test_validacao_rejeita_foto_externa_e_servico_inexistente(): void

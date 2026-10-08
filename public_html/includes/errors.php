@@ -16,15 +16,20 @@ function mensagemErroPublica(int $status): string
     };
 }
 
+function formatarErroAplicacao(Throwable $erro, string $requestId): string
+{
+    return sprintf(
+        '[reiki:%s] tipo=%s origem=%s linha=%d',
+        preg_replace('/[^a-f0-9]/', '', $requestId),
+        get_class($erro),
+        basename($erro->getFile()),
+        $erro->getLine()
+    );
+}
+
 function registrarErroAplicacao(Throwable $erro, string $requestId): void
 {
-    error_log(sprintf(
-        '[reiki:%s] %s em %s:%d',
-        $requestId,
-        $erro->getMessage(),
-        $erro->getFile(),
-        $erro->getLine()
-    ));
+    error_log(formatarErroAplicacao($erro, $requestId));
 }
 
 function configurarTratamentoErros(): void

@@ -195,3 +195,14 @@ Regras:
 - ESLint passou sem erros/avisos?
 - PHPCS/PHPStan passaram?
 - PHPUnit passou (incluindo o teste de `slots.php`), ou o bloqueio foi registrado sem expor segredos?
+# Complemento de regras — Fase 5 (2026-10-07)
+
+R1–R6 corrigidos sem reduzir os gates ou afrouxar CSP; resultado atual em `CORRECOES-FASE-5.md`. Diagnóstico não deve gravar mensagem bruta de exceção; usa identificador, tipo, nome do arquivo e linha. Configuração de destino privado e retenção permanece tarefa da preparação de deploy.
+
+Ampliações aprovadas: uploads restritos a JPG/PNG/WEBP até 5 MB, nomes aleatórios e categorias `servicos`/`profissionais`; exclusão física somente em uploads sem uso, com caminho validado e CSRF. Arquivos de design seguem `assets/img/`, enquanto uploads não devem ser sobrescritos pelo deploy.
+
+Exceção de contato aprovada: no painel autenticado, o telefone do cliente pode compor link HTTPS `wa.me` para contato manual. Não expor contatos publicamente, em filtros internos ou logs; o link não envia mensagem automaticamente.
+
+O resumo financeiro soma somente concluídos e deve permanecer rotulado como estimativa pelo preço atual do catálogo. Serviços sem preço não podem ser tratados como receita conhecida. O novo calendário não cria papel/login próprio de profissional.
+
+Gates continuam obrigatórios: não reduzir limite de 350 linhas, severidade do PHPCS ou CSP para fechar a fase. A revisão encontrou violações e integrações pendentes em [REVISAO-FASE-5.md](REVISAO-FASE-5.md); nenhuma exceção aos gates foi aprovada.

@@ -1,1 +1,6 @@
-<?php http_response_code(404); ?><!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Página não encontrada — Reiki Ana</title></head><body><main><h1>Página não encontrada</h1><p>A página solicitada não foi encontrada.</p><a href="/">Voltar ao início</a></main></body></html>
+<?php
+
+http_response_code(404); ?><!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta
+    name="viewport" content="width=device-width, initial-scale=1"><title>Página não encontrada — Reiki
+    Ana</title></head><body><main><h1>Página não encontrada</h1><p>A página solicitada não foi encontrada.</p>
+    <a href="/">Voltar ao início</a></main></body></html>

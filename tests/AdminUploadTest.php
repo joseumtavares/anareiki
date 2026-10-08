@@ -12,7 +12,8 @@ final class AdminUploadTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->baseDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'reiki-upload-' . bin2hex(random_bytes(4));
+        $this->baseDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'reiki-upload-' .
+        bin2hex(random_bytes(4));
         mkdir($this->baseDir, 0775, true);
         mkdir($this->baseDir . DIRECTORY_SEPARATOR . 'servicos', 0775, true);
     }
@@ -32,14 +33,23 @@ final class AdminUploadTest extends TestCase
     public function test_salva_imagem_valida_em_subpasta_com_nome_aleatorio(): void
     {
         $arquivo = tempnam($this->baseDir, 'src');
-        file_put_contents($arquivo, base64_decode('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAP//////////////////////////////////////////2wBDAf//////////////////////////////////////////wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAX/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIQAxAAAAH/AP/EABQQAQAAAAAAAAAAAAAAAAAAACD/2gAIAQEAAQUCf//EABQRAQAAAAAAAAAAAAAAAAAAABD/2gAIAQMBAT8BP//EABQRAQAAAAAAAAAAAAAAAAAAABD/2gAIAQIBAT8BP//EABQQAQAAAAAAAAAAAAAAAAAAABD/2gAIAQEABj8Cf//Z', true));
+        file_put_contents(
+            $arquivo,
+            base64_decode('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAP////////////////////////////////////' .
+            '//////2wBDAf//////////////////////////////////////////wAARCAABAAEDASIA' .
+            'AhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAX/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/9' .
+            'oADAMBAAIQAxAAAAH/AP/EABQQAQAAAAAAAAAAAAAAAAAAACD/2gAIAQEAAQUCf//EABQR' .
+            'AQAAAAAAAAAAAAAAAAAAABD/2gAIAQMBAT8BP//EABQRAQAAAAAAAAAAAAAAAAAAABD/2g' .
+            'AIAQIBAT8BP//EABQQAQAAAAAAAAAAAAAAAAAAABD/2gAIAQEABj8Cf//Z', true)
+        );
         $resultado = salvarUploadImagem([
             'name' => 'foto.jpg', 'type' => 'image/jpeg', 'tmp_name' => $arquivo,
             'error' => UPLOAD_ERR_OK, 'size' => filesize($arquivo),
         ], 'servicos', $this->baseDir);
 
         self::assertStringStartsWith('/uploads/servicos/', $resultado);
-        self::assertCount(1, glob($this->baseDir . DIRECTORY_SEPARATOR . 'servicos' . DIRECTORY_SEPARATOR . '*'));
+        self::assertCount(1, glob($this->baseDir . DIRECTORY_SEPARATOR . 'servicos' . DIRECTORY_SEPARATOR .
+        '*'));
     }
 
     public function test_rejeita_extensao_e_conteudo_que_nao_sao_imagem(): void

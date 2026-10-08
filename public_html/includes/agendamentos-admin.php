@@ -2,6 +2,21 @@
 
 declare(strict_types=1);
 
+function linkWhatsAppCliente(string $telefone): ?string
+{
+    if (preg_match('/^\+?[0-9\s().-]+$/D', trim($telefone)) !== 1) {
+        return null;
+    }
+    $numero = preg_replace('/[^0-9]/', '', $telefone) ?? '';
+    if (strlen($numero) === 10 || strlen($numero) === 11) {
+        $numero = '55' . $numero;
+    }
+    if (preg_match('/^55[1-9][0-9][2-9][0-9]{7,8}$/D', $numero) !== 1) {
+        return null;
+    }
+    return 'https://wa.me/' . $numero;
+}
+
 /** @return list<string> */
 function destinosStatusAgendamento(string $status): array
 {
@@ -67,6 +82,7 @@ function listarAgendamentosAdmin(PDO $pdo, array $filtros = []): array
         $params[] = $filtros['profissional'];
     }
     $sql = 'SELECT a.id, a.data, a.hora_inicio, a.hora_fim, a.status,
+                   a.cliente_nome, a.cliente_telefone,
                    s.nome AS servico_nome, p.nome AS profissional_nome
             FROM agendamentos a
             INNER JOIN servicos s ON s.id = a.servico_id

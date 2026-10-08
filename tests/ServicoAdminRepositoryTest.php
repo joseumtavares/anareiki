@@ -94,7 +94,8 @@ final class ServicoAdminRepositoryTest extends TestCase
 
     public function test_detecta_imagem_em_uso(): void
     {
-        $this->pdo->exec("UPDATE servicos SET imagem_url = '/uploads/servicos/" . str_repeat('a', 32) . ".jpg' WHERE id = 'ativo'");
+        $this->pdo->exec("UPDATE servicos SET imagem_url = '/uploads/servicos/" . str_repeat('a', 32) .
+        ".jpg' WHERE id = 'ativo'");
         self::assertTrue(imagemServicoEmUso($this->pdo, '/uploads/servicos/' . str_repeat('a', 32) . '.jpg'));
     }
 }

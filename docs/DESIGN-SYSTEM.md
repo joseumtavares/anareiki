@@ -204,3 +204,12 @@ Hoje via Font Awesome (CDN). Ícone decorativo usa `aria-hidden="true"`; ícone 
 3. preservar a paleta roxo/rosa/lilás;
 4. manter variações pequenas;
 5. validar alterações visuais relevantes com o Jose antes de implementar.
+# Atualização administrativa — Fase 5 (2026-10-07)
+
+Após as correções autorizadas, o cadastro de categorias está na página inicial com formulário próprio; serviços mantêm somente seleção. A galeria separa botões/formulários de exclusão da seleção. Menu e confirmação são tratados por JS local; gates aprovados, com revalidação visual pendente. Referências a R2 abaixo são históricas; consultar `CORRECOES-FASE-5.md`.
+
+O painel mantém Bootstrap e a cor primária roxa existente. “Adicionar categoria” usa o mesmo padrão de “Abrir módulo”. Formulários apresentam miniaturas com seleção por radio, seletores de ícone/cor e exemplos de tags. O cadastro de categorias ainda requer integração conforme R2 da revisão.
+
+Agendamentos usam cartões abaixo de 992 px, campos rotulados e ações com quebra de linha e altura mínima de 44 px. Nome e contato identificam o cliente; UUID fica secundário. O gráfico mensal usa pizza SVG colorida, legenda textual com quantidade/concluídos/valores e layout de uma coluna em telas estreitas, evitando transmitir informação apenas por cor.
+
+Calendário: verde identifica disponibilidade, vermelho bloqueio, com rótulos e botão explícito de bloqueio; “Salvar dia” publica a configuração. Intervalos 30/60 min. Aceite visual informado por Jose; fechamento técnico conforme [REVISAO-FASE-5.md](REVISAO-FASE-5.md).

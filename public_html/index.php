@@ -16,7 +16,7 @@ try {
     $servicos = listarServicosPublicos($pdo);
 } catch (Throwable $e) {
     $falhaBanco = true;
-    error_log('Falha ao carregar conteúdo público da home: ' . $e->getMessage());
+    registrarErroAplicacao($e, gerarRequestId());
 }
 
 require __DIR__ . '/includes/layout/home/head.php';

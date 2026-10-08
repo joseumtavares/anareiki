@@ -159,3 +159,21 @@ Exclusão real de registros é evitada — usar `desativar`. Não remover profis
 ## 6. Regra final
 
 Este arquivo documenta o contrato-alvo e o padrão (seção 4) para qualquer endpoint **novo**. A criação efetiva de rotas, regras de negócio ou mudanças de contrato continua exigindo o fluxo de aprovação do `PLANO_MESTRE_ANAREIKI.md` §4.
+
+## 7. Contratos administrativos da Fase 5 — 2026-10-07
+
+Atualização após correções: `/admin/` recebe POST com `categoria` e CSRF para cadastrar categoria independente (até 50 caracteres), com redirecionamento no sucesso. Migration `004_categorias_servicos`; seleção em serviços inclui categorias cadastradas e legadas. A integração do upload profissional R1 foi corrigida. As referências a pendências abaixo preservam a revisão inicial; estado atual em `CORRECOES-FASE-5.md`.
+
+Todos exigem `requireAdmin()`; POST persistente exige CSRF. Sem novos endpoints públicos para dados de clientes.
+
+| Página | Consulta/ação |
+|---|---|
+| `/admin/` | GET `mes=YYYY-MM`; mês atual por padrão; resumo agregado, somente concluídos nos valores; mês inválido retorna 422. Sem cadastro efetivo de categorias nesta versão. |
+| `/admin/servicos.php` | GET listagem/`editar`; POST salvar, `acao=alternar`, `excluir`, `excluir_imagem`; multipart com `imagem_upload` ou `imagem_existente`. Exclusão de entidade bloqueada por vínculos/agendamentos; imagem em uso por serviço é bloqueada. |
+| `/admin/profissionais.php` | GET listagem/`editar`; POST salvar, alternar, excluir; multipart `foto_upload` ou `imagem_existente`; vínculo com serviços. Integração do upload requer R1. |
+| `/admin/disponibilidade.php` | GET `profissional`; POST `profissional_id`, `data=YYYY-MM-DD`, `intervalo=30 ou 60`, `horarios[]=HH:mm`; lista vazia bloqueia a data. Datas passadas e horários desalinhados são rejeitados. |
+| `/admin/agendamentos.php` | GET `inicio`, `fim`, `status`, `profissional`; POST `id` UUID, `origem`, `destino`; atualização condicional, CSRF inválido 403, conflito/transição inválida 409, filtro inválido 422. Exibe contato só no admin. |
+
+Sucesso usa redirecionamento pós-POST. WhatsApp é link de navegação externa acionado pelo administrador, não API/envio automático. Páginas de erro Apache: `/errors/403.php`, `/errors/404.php`, `/errors/500.php`.
+
+Contratos com pendências de integração e cobertura estão detalhados em [REVISAO-FASE-5.md](REVISAO-FASE-5.md); esta seção não declara gates completos aprovados.

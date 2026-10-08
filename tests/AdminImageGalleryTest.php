@@ -12,10 +12,20 @@ final class AdminImageGalleryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->baseDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'reiki-gallery-' . bin2hex(random_bytes(4));
+        $this->baseDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'reiki-gallery-' .
+        bin2hex(random_bytes(4));
         mkdir($this->baseDir, 0775, true);
-        copy(__DIR__ . '/../public_html/favicon.svg', $this->baseDir . DIRECTORY_SEPARATOR . 'nao-imagem.svg');
-        file_put_contents($this->baseDir . DIRECTORY_SEPARATOR . 'foto.jpg', base64_decode('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAP//////////////////////////////////////////2wBDAf//////////////////////////////////////////wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAX/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIQAxAAAAH/AP/EABQQAQAAAAAAAAAAAAAAAAAAACD/2gAIAQEAAQUCf//EABQRAQAAAAAAAAAAAAAAAAAAABD/2gAIAQMBAT8BP//EABQRAQAAAAAAAAAAAAAAAAAAABD/2gAIAQIBAT8BP//EABQQAQAAAAAAAAAAAAAAAAAAABD/2gAIAQEABj8Cf//Z', true));
+        copy(__DIR__ . '/../public_html/favicon.svg', $this->baseDir . DIRECTORY_SEPARATOR .
+        'nao-imagem.svg');
+        file_put_contents(
+            $this->baseDir . DIRECTORY_SEPARATOR . 'foto.jpg',
+            base64_decode('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAP////////////////////////////////////' .
+            '//////2wBDAf//////////////////////////////////////////wAARCAABAAEDASIA' .
+            'AhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAX/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/9' .
+            'oADAMBAAIQAxAAAAH/AP/EABQQAQAAAAAAAAAAAAAAAAAAACD/2gAIAQEAAQUCf//EABQR' .
+            'AQAAAAAAAAAAAAAAAAAAABD/2gAIAQMBAT8BP//EABQRAQAAAAAAAAAAAAAAAAAAABD/2g' .
+            'AIAQIBAT8BP//EABQQAQAAAAAAAAAAAAAAAAAAABD/2gAIAQEABj8Cf//Z', true)
+        );
     }
 
     protected function tearDown(): void

@@ -21,5 +21,8 @@ Datas não configuradas continuam seguindo as regras semanais legadas.
 Intervalos contíguos são agrupados para permitir serviços de maior duração.
 Reservas existentes continuam ocupando seus horários, mesmo quando a data é posteriormente bloqueada.
 
-Verificação automatizada: 91 testes PHPUnit, 428 asserções; PHPStan aprovado.
-A aplicação da migração e o aceite visual autenticado continuam pendentes.
+Verificação consolidada em 07/10/2026: 99 testes PHPUnit, 461 asserções; PHPStan aprovado.
+A migration foi aplicada ao banco local na etapa anterior e Jose confirmou o funcionamento.
+Jose informou a conclusão e aprovação dos testes visuais na conversa de fechamento.
+Isso não equivale à aplicação da migration em produção.
+O fechamento técnico da Fase 5 depende das correções registradas em [REVISAO-FASE-5.md](REVISAO-FASE-5.md).

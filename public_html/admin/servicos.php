@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     excluirUploadImagem($imagem);
                     adminFlash('Imagem excluída.');
                     redirecionar('/admin/servicos.php');
-                } catch (InvalidArgumentException|RuntimeException $e) {
+                } catch (InvalidArgumentException | RuntimeException $e) {
                     $erros['_geral'] = $e->getMessage();
                 }
             }
@@ -58,7 +58,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $valores['imagem_url'] = $imagemEscolhida;
             }
         }
-        if (isset($_FILES['imagem_upload']) && ($_FILES['imagem_upload']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+        if (
+            isset($_FILES['imagem_upload']) && ($_FILES['imagem_upload']['error'] ?? UPLOAD_ERR_NO_FILE) !==
+            UPLOAD_ERR_NO_FILE
+        ) {
             try {
                 $valores['imagem_url'] = salvarUploadImagem($_FILES['imagem_upload'], 'servicos');
             } catch (InvalidArgumentException | RuntimeException $e) {
@@ -68,7 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $erros = array_merge($erros, validarDadosServicoAdmin($valores));
         if ($erros === []) {
             salvarServicoAdmin($pdo, $valores);
-            adminFlash(isset($valores['id']) && $valores['id'] !== '' ? 'Serviço atualizado.' : 'Serviço criado.');
+            adminFlash(isset($valores['id']) && $valores['id'] !== '' ? 'Serviço atualizado.' :
+            'Serviço criado.');
             redirecionar('/admin/servicos.php');
         }
     }
@@ -101,32 +105,66 @@ adminBreadcrumb([
   <a class="btn btn-primary" href="/admin/servicos.php">Novo serviço</a>
 </div>
 <div class="card p-3 p-md-4 mb-4">
-  <h2 class="h5"><?= isset($valores['id']) && $valores['id'] !== '' ? 'Editar serviço' : 'Cadastrar serviço' ?></h2>
+  <h2 class="h5"><?= isset($valores['id']) && $valores['id'] !== '' ? 'Editar serviço' : 'Cadastrar serviço'
+    ?></h2>
   <form method="post" action="/admin/servicos.php" enctype="multipart/form-data" novalidate>
     <?= csrfCampo() ?>
     <?php if (!empty($valores['id'])) :
         ?><input type="hidden" name="id" value="<?= e((string) $valores['id']) ?>"><?php
     endif; ?>
     <div class="row g-3">
-      <?php foreach ([['nome', 'Nome', 'text'], ['categoria', 'Categoria', 'text'], ['duracao_min', 'Duração (minutos)', 'number'], ['preco', 'Preço (opcional)', 'number'], ['ordem', 'Ordem', 'number'], ['icone', 'Ícone', 'text'], ['cor', 'Cor', 'text'], ['tag', 'Tag', 'text']] as [$campo, $rotulo, $tipo]) : ?>
+      <?php foreach (
+        [['nome', 'Nome', 'text'], ['categoria', 'Categoria', 'text'], ['duracao_min',
+        'Duração (minutos)', 'number'], ['preco', 'Preço (opcional)', 'number'], ['ordem', 'Ordem', 'number'],
+        ['icone', 'Ícone', 'text'], ['cor', 'Cor', 'text'], ['tag', 'Tag', 'text']] as [$campo, $rotulo, $tipo]
+) : ?>
         <div class="col-12 col-md-<?= in_array($campo, ['nome', 'categoria'], true) ? '6' : '4' ?>">
           <label class="form-label" for="<?= e($campo) ?>"><?= e($rotulo) ?></label>
-          <?php if ($campo === 'categoria') : ?>
-            <select class="form-select<?= adminErro($erros, $campo) !== null ? ' is-invalid' : '' ?>" id="categoria" name="categoria">
+            <?php if ($campo === 'categoria') : ?>
+            <select class="form-select<?= adminErro($erros, $campo) !== null ? ' is-invalid' : '' ?>"
+    id="categoria" name="categoria">
               <option value="">Selecione uma categoria</option>
-              <?php foreach ($categorias as $categoria) : ?><option value="<?= e($categoria) ?>" <?= adminValor($valores, 'categoria') === $categoria ? 'selected' : '' ?>><?= e($categoria) ?></option><?php endforeach; ?>
-              <?php if (adminValor($valores, 'categoria') !== '' && !in_array(adminValor($valores, 'categoria'), $categorias, true)) : ?><option selected value="<?= e(adminValor($valores, 'categoria')) ?>"><?= e(adminValor($valores, 'categoria')) ?></option><?php endif; ?>
+                <?php foreach ($categorias as $categoria) :
+                    ?><option value="<?= e($categoria) ?>" <?= adminValor($valores, 'categoria') ===
+    $categoria ? 'selected' : '' ?>><?= e($categoria) ?></option><?php
+                endforeach; ?>
+                <?php if (
+                adminValor($valores, 'categoria') !== '' && !in_array(adminValor(
+                    $valores,
+                    'categoria'
+                ), $categorias, true)
+) :
+    ?><option selected value="<?= e(adminValor($valores, 'categoria')) ?>"><?=
+    e(adminValor($valores, 'categoria')) ?></option><?php
+                endif; ?>
             </select>
-            <div class="form-text">Para criar uma categoria, use o campo abaixo.</div>
-          <?php elseif ($campo === 'icone') : ?>
-            <select class="form-select" id="icone" name="icone"><option value="">Sem ícone</option><?php foreach (opcoesIconeServico() as $icone) : ?><option value="<?= e($icone) ?>" <?= adminValor($valores, 'icone') === $icone ? 'selected' : '' ?>><?= e($icone) ?></option><?php endforeach; ?></select>
-          <?php elseif ($campo === 'cor') : ?>
-            <div class="d-flex flex-wrap gap-2"><?php foreach (opcoesCorServico() as $cor) : ?><label class="border rounded p-2"><input type="radio" name="cor" value="<?= e($cor) ?>" <?= adminValor($valores, 'cor') === $cor ? 'checked' : '' ?>> <span class="badge text-bg-<?= e($cor === 'purple' ? 'secondary' : 'light') ?>"><?= e($cor) ?></span></label><?php endforeach; ?></div>
-          <?php elseif ($campo === 'tag') : ?>
-            <input class="form-control" list="tags-servico" type="text" id="tag" name="tag" value="<?= e(adminValor($valores, 'tag')) ?>"><datalist id="tags-servico"><?php foreach (exemplosTagServico() as $tag) : ?><option value="<?= e($tag) ?>"><?php endforeach; ?></datalist>
-          <?php else : ?>
-            <input class="form-control<?= adminErro($erros, $campo) !== null ? ' is-invalid' : '' ?>" type="<?= e($tipo) ?>" id="<?= e($campo) ?>" name="<?= e($campo) ?>" value="<?= e(adminValor($valores, $campo)) ?>">
-          <?php endif; ?>
+            <div class="form-text">Categorias são cadastradas na página inicial do painel.</div>
+            <?php elseif ($campo === 'icone') : ?>
+            <select class="form-select" id="icone" name="icone"><option value="">Sem ícone</option><?php
+            foreach (opcoesIconeServico() as $icone) :
+                ?><option value="<?= e($icone) ?>" <?= adminValor($valores, 'icone') === $icone ? 'selected'
+    : '' ?>><?= e($icone) ?></option><?php
+            endforeach; ?></select>
+            <?php elseif ($campo === 'cor') : ?>
+            <div class="d-flex flex-wrap gap-2"><?php foreach (opcoesCorServico() as $cor) :
+                ?><label class="border rounded p-2"><input type="radio" name="cor" value="<?= e($cor) ?>" <?=
+    adminValor($valores, 'cor') === $cor ? 'checked' : '' ?>> <span class="badge text-bg-<?= e($cor ===
+    'purple' ? 'secondary' : 'light') ?>"><?= e($cor) ?></span></label><?php
+                                                endforeach; ?></div>
+            <?php elseif ($campo === 'tag') : ?>
+            <input class="form-control" list="tags-servico" type="text" id="tag" name="tag" value="<?=
+            e(adminValor($valores, 'tag')) ?>"><datalist id="tags-servico"><?php foreach (
+                exemplosTagServico() as $tag
+            ) :
+                ?><option value="<?= e($tag) ?>"><?php
+            endforeach; ?></datalist>
+            <?php else : ?>
+            <input class="form-control<?= adminErro($erros, $campo) !== null ? ' is-invalid' : '' ?>"
+    type="<?= e($tipo) ?>" id="<?= e($campo) ?>" name="<?= e($campo) ?>" value="<?= e(adminValor(
+        $valores,
+        $campo
+    )) ?>">
+            <?php endif; ?>
             <?php if (adminErro($erros, $campo) !== null) :
                 ?><div class="invalid-feedback"><?= e((string) adminErro($erros, $campo)) ?></div><?php
             endif; ?>
@@ -139,13 +177,17 @@ adminBreadcrumb([
             <?php foreach ($imagensDisponiveis as $imagem) : ?>
               <div class="col-6 col-sm-4 col-md-3">
                 <label class="card p-2 h-100">
-                  <img class="img-fluid rounded" src="<?= e($imagem) ?>" alt="Miniatura disponível" loading="lazy" style="aspect-ratio:1;object-fit:cover">
-                  <span class="form-check mt-2"><input class="form-check-input" type="radio" name="imagem_existente" value="<?= e($imagem) ?>" <?= adminValor($valores, 'imagem_url') === $imagem ? 'checked' : '' ?>> Usar esta imagem</span>
-                  <form method="post" action="/admin/servicos.php" class="mt-2" onsubmit="return confirm('Excluir esta imagem permanentemente?');">
-                    <?= csrfCampo() ?><input type="hidden" name="acao" value="excluir_imagem"><input type="hidden" name="id" value="<?= e((string) ($valores['id'] ?? '')) ?>"><input type="hidden" name="imagem" value="<?= e($imagem) ?>">
-                    <button class="btn btn-sm btn-outline-danger" type="submit">Excluir imagem</button>
-                  </form>
+                  <img class="img-fluid rounded" src="<?= e($imagem) ?>" alt="Miniatura disponível"
+    loading="lazy" style="aspect-ratio:1;object-fit:cover">
+                  <span class="form-check mt-2"><input class="form-check-input" type="radio"
+    name="imagem_existente" value="<?= e($imagem) ?>" <?= adminValor($valores, 'imagem_url') === $imagem ?
+    'checked' : '' ?>> Usar esta imagem</span>
                 </label>
+                <button class="btn btn-sm btn-outline-danger mt-2" type="submit"
+                        form="excluir-imagem-<?= e((string) array_search($imagem, $imagensDisponiveis, true))
+                        ?>">
+                  Excluir imagem
+                </button>
               </div>
             <?php endforeach; ?>
           </div>
@@ -153,7 +195,8 @@ adminBreadcrumb([
       <?php endif; ?>
       <div class="col-12 col-md-6">
         <label class="form-label" for="imagem_upload">Imagem do serviço</label>
-        <input class="form-control<?= adminErro($erros, 'imagem_upload') !== null ? ' is-invalid' : '' ?>" type="file" id="imagem_upload" name="imagem_upload" accept="image/jpeg,image/png,image/webp">
+        <input class="form-control<?= adminErro($erros, 'imagem_upload') !== null ? ' is-invalid' : '' ?>"
+    type="file" id="imagem_upload" name="imagem_upload" accept="image/jpeg,image/png,image/webp">
         <div class="form-text">JPG, PNG ou WEBP, até 5 MB.</div>
         <?php if (adminErro($erros, 'imagem_upload') !== null) :
             ?><div class="invalid-feedback"><?= e((string) adminErro($erros, 'imagem_upload')) ?></div><?php
@@ -161,7 +204,8 @@ adminBreadcrumb([
       </div>
       <div class="col-12">
         <label class="form-label" for="descricao">Descrição</label>
-        <textarea class="form-control<?= adminErro($erros, 'descricao') !== null ? ' is-invalid' : '' ?>" id="descricao" name="descricao" rows="3"><?= e(adminValor($valores, 'descricao')) ?></textarea>
+        <textarea class="form-control<?= adminErro($erros, 'descricao') !== null ? ' is-invalid' : '' ?>"
+    id="descricao" name="descricao" rows="3"><?= e(adminValor($valores, 'descricao')) ?></textarea>
         <?php if (adminErro($erros, 'descricao') !== null) :
             ?><div class="invalid-feedback"><?= e((string) adminErro($erros, 'descricao')) ?></div><?php
         endif; ?>
@@ -170,15 +214,36 @@ adminBreadcrumb([
     <button class="btn btn-primary mt-3" type="submit">Salvar serviço</button>
   </form>
 </div>
+<?php foreach ($imagensDisponiveis as $indice => $imagem) : ?>
+<form id="excluir-imagem-<?= e((string) $indice) ?>" method="post" action="/admin/servicos.php"
+      data-confirm="Excluir esta imagem permanentemente?">
+    <?= csrfCampo() ?>
+  <input type="hidden" name="acao" value="excluir_imagem">
+  <input type="hidden" name="imagem" value="<?= e($imagem) ?>">
+</form>
+<?php endforeach; ?>
 <div class="card p-3 p-md-4">
   <h2 class="h5">Catálogo</h2>
   <?php if ($servicos === []) : ?>
     <p class="text-secondary mb-0">Nenhum serviço cadastrado.</p>
   <?php else : ?>
     <div class="table-responsive">
-      <table class="table align-middle"><thead><tr><th>Nome</th><th>Categoria</th><th>Duração</th><th>Status</th><th class="text-end">Ações</th></tr></thead><tbody>
+      <table class="table align-middle"><thead><tr><th>Nome</th><th>Categoria</th><th>Duração</th><th>
+    Status</th><th class="text-end">Ações</th></tr></thead><tbody>
       <?php foreach ($servicos as $servico) : ?>
-        <tr><td><?= e((string) $servico['nome']) ?></td><td><?= e((string) $servico['categoria']) ?></td><td><?= e((string) $servico['duracao_min']) ?> min</td><td><?= (int) $servico['ativo'] === 1 ? 'Ativo' : 'Inativo' ?></td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="/admin/servicos.php?editar=<?= e((string) $servico['id']) ?>">Editar</a> <form class="d-inline" method="post" action="/admin/servicos.php"><input type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>"><input type="hidden" name="acao" value="alternar"><input type="hidden" name="id" value="<?= e((string) $servico['id']) ?>"><input type="hidden" name="ativo" value="<?= (int) $servico['ativo'] === 1 ? '0' : '1' ?>"><button class="btn btn-sm btn-outline-secondary" type="submit"><?= (int) $servico['ativo'] === 1 ? 'Desativar' : 'Ativar' ?></button></form> <form class="d-inline" method="post" action="/admin/servicos.php" onsubmit="return confirm('Excluir este serviço permanentemente?');"><input type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>"><input type="hidden" name="acao" value="excluir"><input type="hidden" name="id" value="<?= e((string) $servico['id']) ?>"><button class="btn btn-sm btn-outline-danger" type="submit">Excluir</button></form></td></tr>
+        <tr><td><?= e((string) $servico['nome']) ?></td><td><?= e((string) $servico['categoria']) ?></td><td>
+            <?= e((string) $servico['duracao_min']) ?> min</td><td><?= (int) $servico['ativo'] === 1 ? 'Ativo' :
+            'Inativo' ?></td><td class="text-end"><a class="btn btn-sm btn-outline-primary"
+    href="/admin/servicos.php?editar=<?= e((string) $servico['id']) ?>">Editar</a> <form class="d-inline"
+    method="post" action="/admin/servicos.php"><input type="hidden" name="csrf_token" value="<?=
+    e(csrfToken()) ?>"><input type="hidden" name="acao" value="alternar"><input type="hidden" name="id"
+    value="<?= e((string) $servico['id']) ?>"><input type="hidden" name="ativo" value="<?= (int)
+    $servico['ativo'] === 1 ? '0' : '1' ?>"><button class="btn btn-sm btn-outline-secondary" type="submit">
+            <?= (int) $servico['ativo'] === 1 ? 'Desativar' : 'Ativar' ?></button></form> <form class="d-inline"
+    method="post" action="/admin/servicos.php" data-confirm="Excluir este serviço permanentemente?"><input
+    type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>"><input type="hidden" name="acao"
+    value="excluir"><input type="hidden" name="id" value="<?= e((string) $servico['id']) ?>"><button
+    class="btn btn-sm btn-outline-danger" type="submit">Excluir</button></form></td></tr>
       <?php endforeach; ?>
       </tbody></table>
     </div>

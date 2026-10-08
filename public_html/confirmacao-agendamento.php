@@ -18,7 +18,7 @@ $agendamento = null;
 try {
     $agendamento = obterAgendamento(db(), $id);
 } catch (Throwable $e) {
-    error_log('Erro ao buscar agendamento: ' . $e->getMessage());
+    registrarErroAplicacao($e, gerarRequestId());
 }
 
 if ($agendamento === null) {
