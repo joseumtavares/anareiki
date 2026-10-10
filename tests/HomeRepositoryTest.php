@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
-$repositoryFile = __DIR__ . '/../public_html/includes/repositories.php';
+$repositoryFile = __DIR__ . '/../includes/repositories.php';
 if (is_file($repositoryFile)) {
     require_once $repositoryFile;
 }

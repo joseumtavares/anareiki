@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../public_html/includes/slots.php';
+require_once __DIR__ . '/../includes/slots.php';
 
 final class DisponibilidadeDataTest extends TestCase
 {

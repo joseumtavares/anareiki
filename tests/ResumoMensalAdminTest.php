@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../public_html/includes/resumo-mensal-admin.php';
-require_once __DIR__ . '/../public_html/includes/layout/admin.php';
-require_once __DIR__ . '/../public_html/includes/layout/admin-resumo-mensal.php';
+require_once __DIR__ . '/../includes/resumo-mensal-admin.php';
+require_once __DIR__ . '/../includes/layout/admin.php';
+require_once __DIR__ . '/../includes/layout/admin-resumo-mensal.php';
 
 final class ResumoMensalAdminTest extends TestCase
 {

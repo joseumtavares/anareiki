@@ -76,7 +76,7 @@ Estrutura de pastas completa em `ARCHITECTURE.md` §5.
 
 ## 5. Organização de pastas
 
-Documentação em `docs/`. Aplicação em `public_html/` conforme `ARCHITECTURE.md` §5. `config.php` e `includes/` nunca servidos diretamente (bloqueio no `.htaccess`).
+Documentação em `docs/`. A aplicação publicada fica na raiz conforme `ARCHITECTURE.md` §5. `config.php` e `includes/` nunca são servidos diretamente (bloqueio no `.htaccess`).
 
 ## 6. Estrutura de commits
 
@@ -158,7 +158,7 @@ Toda alteração de código deve passar, antes de revisão, pelos comandos aplic
 | PHP — análise estática | **PHPStan** | `composer stan` |
 | PHP — testes | **PHPUnit** | `composer test` |
 
-(Os scripts do Composer chamam os binários de `public_html/vendor/bin/`; configuração em `phpcs.xml`, `phpstan.neon` e `phpunit.xml` na raiz.)
+(Os scripts do Composer chamam os binários de `vendor/bin/`; configuração em `phpcs.xml`, `phpstan.neon` e `phpunit.xml` na raiz.)
 
 Regras:
 

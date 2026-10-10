@@ -1,0 +1,270 @@
+/* ---------- PACOTES ---------- */
+.pacotes-section {
+  padding: 100px 0;
+  background: linear-gradient(160deg, var(--purple-dark) 0%, var(--dark) 50%, var(--purple) 100%);
+}
+
+.pacotes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+  grid-auto-rows: 1fr;
+  gap: 24px;
+}
+
+.pacote-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.pacote-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--rose), var(--purple-light));
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.pacote-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(201,168,224,0.4);
+  background: rgba(255,255,255,0.1);
+}
+
+.pacote-card:hover::before { opacity: 1; }
+
+.destaque-card {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(201,168,224,0.5);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.pacote-badge-top {
+  position: absolute;
+  top: -1px; right: 16px;
+  background: var(--rose);
+  color: var(--white);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 0 0 10px 10px;
+  letter-spacing: 0.04em;
+}
+
+.pacote-header h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+
+.pacote-tag {
+  display: inline-block;
+  background: rgba(201,168,224,0.2);
+  color: var(--purple-light);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.pacote-body p {
+  color: rgba(255,255,255,0.75);
+  font-size: 0.88rem;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+
+.pacote-detail {
+  color: rgba(255,255,255,0.85);
+  font-size: 0.83rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.pacote-detail i { color: var(--rose); font-size: 0.75rem; }
+
+.pacote-preco {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.pacote-preco .de {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.4);
+  text-decoration: line-through;
+}
+
+.pacote-preco .por {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.9);
+}
+
+.pacote-preco .por strong {
+  font-size: 1.4rem;
+  color: var(--rose);
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.btn-pacote {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.12);
+  color: var(--white);
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  transition: var(--transition);
+  margin-top: auto;
+}
+
+.btn-pacote:hover {
+  background: var(--purple);
+  border-color: var(--purple);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  color: var(--white);
+}
+
+.btn-orcamento {
+  background: var(--rose);
+  border-color: var(--rose);
+}
+
+.btn-orcamento:hover {
+  background: #d4849b;
+  border-color: #d4849b;
+}
+
+.pacote-flex .pacote-header h3 { color: var(--rose); }
+
+/* ---------- HORÁRIOS ---------- */
+.horarios-section {
+  padding: 100px 0;
+  background: var(--white);
+}
+
+.horarios-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+
+.horario-item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 20px;
+  background: var(--rose-pale);
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  border: 1px solid rgba(232,164,192,0.3);
+  transition: var(--transition);
+}
+
+.horario-item:hover {
+  border-color: var(--purple-light);
+  transform: translateX(4px);
+}
+
+.destaque-horario {
+  background: linear-gradient(135deg, rgba(123,79,158,0.08), rgba(201,168,224,0.1));
+  border-color: var(--purple-light);
+}
+
+.horario-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--purple);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.horario-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.horario-info strong {
+  font-size: 0.95rem;
+  color: var(--dark);
+  font-weight: 700;
+}
+
+.horario-info span {
+  font-size: 0.88rem;
+  color: var(--text-light);
+}
+
+.horarios-obs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 14px 18px;
+  background: rgba(123,79,158,0.06);
+  border-radius: var(--radius-sm);
+  color: var(--purple);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px dashed var(--purple-light);
+}
+
+.lembrete-card {
+  background: linear-gradient(135deg, var(--purple), var(--rose));
+  border-radius: 24px;
+  padding: 40px 32px;
+  text-align: center;
+  color: var(--white);
+  box-shadow: var(--shadow-lg);
+}
+
+.lembrete-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  animation: swing 2s ease-in-out infinite;
+}
+
+.lembrete-card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.lembrete-card p {
+  font-size: 0.95rem;
+  opacity: 0.9;
+  line-height: 1.7;
+  margin-bottom: 28px;
+}

@@ -25,7 +25,7 @@ composer install
 
 Se já tem o repositório, entre na pasta dele, atualize sua branch conforme o fluxo da equipe e execute `npm ci` e `composer install`.
 
-O Composer está configurado para instalar dependências PHP em `public_html/vendor/`. Não versione essa pasta. Para verificar as ferramentas instaladas:
+O Composer instala dependências PHP em `vendor/`. Não versione essa pasta. Para verificar as ferramentas instaladas:
 
 ```powershell
 node --version
@@ -58,18 +58,19 @@ As migrações são destinadas a um banco vazio. Não reaplique uma migração j
 
 ## 5. Configurar a aplicação PHP
 
-A aplicação lê `config.php` na raiz do repositório. Esse arquivo não é versionado porque contém credenciais; o modelo com a estrutura esperada está em `public_html/config.example.php`.
+A aplicação lê `config.php` na raiz do repositório. Esse arquivo não é versionado porque contém credenciais; o modelo com a estrutura esperada está em `config.example.php`.
 
-1. Se `config.php` ainda não existir, copie `public_html/config.example.php` para `config.php` na raiz do repositório (ao lado de `composer.json`). Se ele já existir, preserve o arquivo e revise seus valores sem o substituir.
+1. Se `config.php` ainda não existir, copie `config.example.php` para `config.php` na raiz do repositório (ao lado de `composer.json`). Se ele já existir, preserve o arquivo e revise seus valores sem o substituir.
 2. Preencha `db` para o banco local: host `127.0.0.1`, nome `anareiki`, usuário `root` e a senha configurada no seu MySQL local (em uma instalação XAMPP padrão, normalmente vazia).
 3. Ajuste `debug` para `true` apenas no seu ambiente local.
-4. SMTP é opcional para abrir o site, mas é necessário para validar o fluxo de login/2FA por e-mail. Use credenciais de desenvolvimento autorizadas pela equipe. Nunca coloque segredos em commits, issues, documentação ou mensagens.
+4. Mantenha `maintenance_mode` como `false`. Use `true` somente durante uma manutenção planejada e retorne imediatamente a `false` quando ela terminar.
+5. SMTP é opcional para abrir o site, mas é necessário para validar o fluxo de login/2FA por e-mail. Use credenciais de desenvolvimento autorizadas pela equipe. Nunca coloque segredos em commits, issues, documentação ou mensagens.
 
-O projeto **não carrega variáveis de ambiente `.env`** atualmente. Os nomes usados na configuração são as chaves do array PHP `debug`, `db.host`, `db.nome`, `db.usuario`, `db.senha`, `smtp.host`, `smtp.porta`, `smtp.usuario`, `smtp.senha` e `smtp.remetente_nome`. O arquivo `config.php` é a fonte desses valores; não crie `.env` esperando que a aplicação o leia.
+O projeto **não carrega variáveis de ambiente `.env`** atualmente. Os nomes usados na configuração são as chaves do array PHP `debug`, `maintenance_mode`, `db.host`, `db.nome`, `db.usuario`, `db.senha`, `smtp.host`, `smtp.porta`, `smtp.usuario`, `smtp.senha` e `smtp.remetente_nome`. O arquivo `config.php` é a fonte desses valores; não crie `.env` esperando que a aplicação o leia.
 
-## 6. Configurar o Apache para servir `public_html`
+## 6. Configurar o Apache para servir a raiz do repositório
 
-O document root precisa ser `public_html`, e não a raiz do repositório: assim `config.php`, `sql/`, `bin/` e os arquivos de desenvolvimento ficam fora da raiz web. Configure um VirtualHost local na porta 8080.
+O deploy Git da Hostinger publica a raiz do repositório diretamente em `/public_html`. Portanto, o document root local também deve ser a raiz do repositório. O `.htaccess` bloqueia `config.php`, `includes/`, `vendor/`, `sql/`, `tests/` e `bin/`. Configure um VirtualHost local na porta 8080.
 
 1. No painel do XAMPP, em **Apache → Config**, abra `httpd.conf`.
 2. Garanta que estas diretivas estejam ativas (sem `#` no início):
@@ -86,8 +87,8 @@ Include conf/extra/httpd-vhosts.conf
 ```apache
 <VirtualHost *:8080>
     ServerName localhost
-    DocumentRoot "C:/Users/SEU-USUARIO/anareiki/public_html"
-    <Directory "C:/Users/SEU-USUARIO/anareiki/public_html">
+    DocumentRoot "C:/Users/SEU-USUARIO/anareiki"
+    <Directory "C:/Users/SEU-USUARIO/anareiki">
         AllowOverride All
         Require local
     </Directory>
@@ -98,6 +99,29 @@ Include conf/extra/httpd-vhosts.conf
 5. Abra `http://localhost:8080/`.
 
 `AllowOverride All` permite que as regras de `.htaccess` do projeto sejam aplicadas. O Apache precisa ter o módulo `rewrite` habilitado. A sintaxe de VirtualHost segue a [documentação oficial do Apache](https://httpd.apache.org/docs/current/vhosts/examples.html).
+
+### Páginas de erro e manutenção
+
+O `.htaccess` entrega páginas próprias para `403`, `404`, `500`, `502`, `503` e `504`. Verifique-as pelo Apache, e não por `php -S`, porque o servidor embutido do PHP não processa `ErrorDocument` nem as regras de acesso.
+
+Para uma manutenção planejada:
+
+1. Edite somente o arquivo local/privado `config.php` e altere `maintenance_mode` para `true`.
+2. Confira que a home retorna `503` com a página de manutenção e que uma API, como `/api/profissionais.php`, retorna `503` em JSON com o cabeçalho `Retry-After`.
+3. Mantenha `/admin/login.php` acessível para concluir a manutenção.
+4. Retorne `maintenance_mode` a `false` e confirme que a home volta a `200` antes de encerrar a janela.
+
+Erros `502`, `503` e `504` emitidos por proxy, CDN ou infraestrutura antes de a requisição alcançar o Apache/PHP podem ser substituídos pela própria hospedagem. Para esses casos, cadastre conteúdo equivalente em **hPanel → Error Pages**; a Hostinger documenta esse recurso em [Customize your website's error pages](https://support.hostinger.com/en/articles/1583295-how-to-customize-your-website-s-error-pages-in-hostinger). O conteúdo versionado continua sendo a referência para todos os erros que chegam à aplicação.
+
+| Cenário de aceite | Resultado esperado |
+| --- | --- |
+| URL pública inexistente | `404`, página “Parece que este caminho se perdeu.”, sem detalhe técnico. |
+| Arquivo ou diretório protegido | `403`, página “Este espaço é reservado.”, sem conteúdo interno. |
+| Template interno `/errors/error-page.php` | `403`, sem executar o template diretamente. |
+| Exceção não tratada do PHP | `500`, identificador de atendimento escapado e sem stack trace. |
+| Entrada local `/errors/502.php`, `/errors/503.php` ou `/errors/504.php` | Respectivamente `502`, `503` ou `504`, com texto humanizado e ações navegáveis. |
+| `maintenance_mode=true` na home | `503` em HTML, `Retry-After: 3600` e cache desabilitado. |
+| `maintenance_mode=true` em API | `503` em JSON, `Retry-After: 3600`, sem HTML. |
 
 ## 7. Rodar o projeto
 
@@ -140,7 +164,7 @@ composer cs
 - **Apache não inicia:** confira conflito de portas e os logs em `C:\xampp\apache\logs\error.log`.
 - **Erro de conexão PDO:** confirme que MySQL iniciou, que o banco `anareiki` existe e que os valores `db` em `config.php` correspondem ao seu XAMPP.
 - **PDO MySQL não encontrado:** confira `php.ini` da versão de PHP usada pelo Apache e pelo terminal; habilite `extension=pdo_mysql` e reinicie o Apache.
-- **Erro 404 ou regras ignoradas:** valide o caminho do `DocumentRoot`, `AllowOverride All` e `mod_rewrite`; reinicie o Apache após mudanças.
+- **Erro 404/403 ou regras ignoradas:** valide o caminho do `DocumentRoot`, `AllowOverride All` e `mod_rewrite`; reinicie o Apache após mudanças.
 - **`composer` ou `php` não reconhecido:** reinstale/configure o `PATH` ou abra um terminal novo após atualizar o `PATH`.
 - **Porta Vite ocupada:** o Vite indicará outra porta disponível no terminal; use o endereço informado.
 

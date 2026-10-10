@@ -1,9 +1,10 @@
 parameters:
     level: 5
     paths:
-        - public_html/includes
-        - public_html/admin
+        - includes
+        - errors
+        - admin
         - bin
         - tests
     excludePaths:
-        - public_html/vendor
+        - vendor

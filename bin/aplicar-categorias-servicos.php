@@ -5,7 +5,7 @@ declare(strict_types=1);
 if (PHP_SAPI !== 'cli') {
     exit(1);
 }
-require_once __DIR__ . '/../public_html/includes/db.php';
+require_once __DIR__ . '/../includes/db.php';
 
 $pdo = db();
 // Recusa explicitamente destinos remotos: este helper é apenas para desenvolvimento local.

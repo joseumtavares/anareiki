@@ -11,7 +11,7 @@ if (PHP_SAPI !== 'cli') {
     exit;
 }
 
-require_once __DIR__ . '/../public_html/includes/db.php';
+require_once __DIR__ . '/../includes/db.php';
 
 function perguntar(string $rotulo): string
 {

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../public_html/includes/db.php';
-require_once __DIR__ . '/../public_html/includes/repositories.php';
+require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/repositories.php';
 
-$slotsFile = __DIR__ . '/../public_html/includes/slots.php';
+$slotsFile = __DIR__ . '/../includes/slots.php';
 if (is_file($slotsFile)) {
     require_once $slotsFile;
 }
@@ -18,6 +18,7 @@ final class SlotsTest extends TestCase
 
     private const ANA_ID = '01a0db02-f800-76df-a6eb-97a169b3083f';
     private const SERVICO_ID = '01a0db02-f801-752e-811c-921ba4595ebb';
+    private const SERVICO2_ID = '01a0db02-f802-7ad2-ae14-3374b133abbe';
 
     protected function setUp(): void
     {
@@ -55,6 +56,12 @@ final class SlotsTest extends TestCase
         )');
         $this->pdo->exec("CREATE UNIQUE INDEX uq_agend_slot
             ON agendamentos (profissional_id, data, hora_inicio)");
+        $this->pdo->exec('CREATE TABLE agendamento_servicos (
+            id TEXT PRIMARY KEY, agendamento_id TEXT NOT NULL,
+            servico_id TEXT NOT NULL, nome_servico TEXT NOT NULL,
+            duracao_min INTEGER NOT NULL, preco NUMERIC, ordem INTEGER NOT NULL,
+            hora_inicio TEXT NOT NULL, hora_fim TEXT NOT NULL
+        )');
 
         $this->pdo->exec("INSERT INTO profissionais (id, nome, especialidade, ativo)
             VALUES ('" . self::ANA_ID . "', 'Ana', 'Massoterapeuta', 1)");
@@ -65,6 +72,13 @@ final class SlotsTest extends TestCase
         $this->pdo->exec("INSERT INTO profissional_servico
             (profissional_id, servico_id)
             VALUES ('" . self::ANA_ID . "', '" . self::SERVICO_ID . "')");
+        $this->pdo->exec("INSERT INTO servicos
+            (id, nome, descricao, duracao_min, preco, categoria, ativo, ordem)
+            VALUES ('" . self::SERVICO2_ID . "', 'Reiki',
+            'DescriÃ§Ã£o', 30, 50.00, 'Massagens', 1, 2)");
+        $this->pdo->exec("INSERT INTO profissional_servico
+            (profissional_id, servico_id)
+            VALUES ('" . self::ANA_ID . "', '" . self::SERVICO2_ID . "')");
 
         // Sábado (6) 09:00–18:00
         $this->pdo->exec("INSERT INTO disponibilidade
@@ -204,6 +218,51 @@ final class SlotsTest extends TestCase
             '20:00', '20:30', '21:00', '21:30',
         ];
         self::assertSame($esperado, $slots);
+    }
+
+    public function test_grade_indica_reserva_e_escolha_provisoria_sem_expor_cliente(): void
+    {
+        $this->inserirAgendamento('2026-10-03', '10:00', '11:00');
+
+        $grade = obterEstadosSlotsServico(
+            $this->pdo,
+            self::ANA_ID,
+            '2026-10-03',
+            60,
+            [['hora_inicio' => '11:00', 'hora_fim' => '12:00']]
+        );
+
+        self::assertSame(['inicio' => '09:00', 'fim' => '10:00', 'estado' => 'disponivel'], $grade[0]);
+        self::assertSame('agendado', $grade[1]['estado']);
+        self::assertSame('indisponivel', $grade[2]['estado']);
+        self::assertArrayNotHasKey('cliente_nome', $grade[1]);
+    }
+
+    public function test_existe_combinacao_para_servicos_em_horarios_separados(): void
+    {
+        $this->inserirAgendamento('2026-10-03', '10:00', '11:00');
+
+        self::assertTrue(existeCombinacaoHorarios(
+            $this->pdo,
+            self::ANA_ID,
+            '2026-10-03',
+            [
+                ['id' => self::SERVICO_ID, 'duracao_min' => 60],
+                ['id' => self::SERVICO2_ID, 'duracao_min' => 30],
+            ]
+        ));
+    }
+
+    public function test_estado_do_dia_indica_agendado_sem_disponibilidade_para_combinacao(): void
+    {
+        $this->inserirAgendamento('2026-10-03', '09:00', '18:00');
+
+        self::assertSame('agendado', obterEstadoDiaAgendamento(
+            $this->pdo,
+            self::ANA_ID,
+            '2026-10-03',
+            [['id' => self::SERVICO_ID, 'duracao_min' => 60]]
+        ));
     }
 
     // --- Testes de obterDisponibilidadeDia ---

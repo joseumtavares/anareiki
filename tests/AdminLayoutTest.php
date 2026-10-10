@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../public_html/includes/auth.php';
-require_once __DIR__ . '/../public_html/includes/layout/admin.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/layout/admin.php';
 
 final class AdminLayoutTest extends TestCase
 {
