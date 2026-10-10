@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../public_html/includes/auth.php';
-require_once __DIR__ . '/../public_html/includes/admin.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/admin.php';
 
 final class AdminDashboardTest extends TestCase
 {
@@ -26,7 +26,7 @@ final class AdminDashboardTest extends TestCase
         adminFlash('Serviço salvo.', 'success');
 
         ob_start();
-        require __DIR__ . '/../public_html/admin/index.php';
+        require __DIR__ . '/../admin/index.php';
         $html = (string) ob_get_clean();
 
         self::assertStringContainsString('Ana &lt;script&gt;', $html);

@@ -3,7 +3,7 @@ import { relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)))
-const sourceDirectories = ['src', 'public', 'public_html', 'bin', 'tests', 'scripts', 'sql']
+const sourceDirectories = ['src', 'public', 'admin', 'api', 'includes', 'static', 'bin', 'tests', 'scripts', 'sql']
 const ignoredDirectories = new Set(['vendor', 'node_modules'])
 const sourceExtensions = new Set(['.js', '.mjs', '.cjs', '.ts', '.tsx', '.php', '.css', '.html', '.sql'])
 const maximumLines = 350
@@ -37,7 +37,7 @@ for (const file of [
   'phpstan.neon',
   'phpcs.xml',
   'phpunit.xml',
-  'public_html/.htaccess',
+  '.htaccess',
 ]) {
   const path = resolve(root, file)
   const source = await readFile(path, 'utf8')

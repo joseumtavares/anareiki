@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../public_html/includes/errors.php';
+require_once __DIR__ . '/../includes/errors.php';
 
 final class ErrorHandlingTest extends TestCase
 {
@@ -25,10 +25,17 @@ final class ErrorHandlingTest extends TestCase
         self::assertMatchesRegularExpression('/^[a-f0-9]{16}$/', $id);
     }
 
-    public function test_mensagem_publica_nao_expoe_detalhes_da_excecao(): void
+    public function test_catalogo_publico_tem_textos_humanizados_para_os_status_suportados(): void
     {
-        self::assertSame('Ocorreu um erro inesperado. Informe o código de atendimento.', mensagemErroPublica(500));
-        self::assertSame('A página solicitada não foi encontrada.', mensagemErroPublica(404));
-        self::assertSame('Você não tem permissão para acessar este recurso.', mensagemErroPublica(403));
+        self::assertSame('Este espaço é reservado.', dadosPaginaErro(403)['titulo']);
+        self::assertSame('Parece que este caminho se perdeu.', dadosPaginaErro(404)['titulo']);
+        self::assertSame('Nossa casa fez uma pausa inesperada.', dadosPaginaErro(500)['titulo']);
+        self::assertSame('A ponte até o nosso espaço falhou por um instante.', dadosPaginaErro(502)['titulo']);
+        self::assertSame('Estamos preparando o espaço para receber você.', dadosPaginaErro(503)['titulo']);
+        self::assertSame('O atendimento digital demorou mais que o normal.', dadosPaginaErro(504)['titulo']);
+        self::assertSame(
+            'Nossa casa fez uma pausa inesperada.',
+            dadosPaginaErro(418)['titulo']
+        );
     }
 }

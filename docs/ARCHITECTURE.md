@@ -1,7 +1,7 @@
 # Arquitetura — Reiki Ana
 
-Status: arquitetura PHP + MySQL; Fase 4 concluída
-Última revisão: 2026-10-01
+Status: arquitetura PHP + MySQL; agendamento múltiplo em implementação
+Última revisão: 2026-10-09
 
 > **Governança:** o status de execução de cada fase (concluída/parcial/bloqueada) é controlado em `PLANO_MESTRE_ANAREIKI.md`. Este documento descreve a arquitetura técnica; não deve ser usado para acompanhar andamento de fase.
 
@@ -30,15 +30,12 @@ O repositório mantém o protótipo Hono/Cloudflare durante a migração e já c
 
 ```text
 Anareiki/
-├── public_html/index.php             # home PHP; consulta serviços e profissionais ativos
-├── public_html/agendar.php           # fluxo de agendamento (form + calendário + POST)
-├── public_html/confirmacao-agendamento.php  # confirmação + link WhatsApp
-├── public_html/api/slots.php         # GET JSON: horários livres (rate limit 10/min)
-├── public_html/api/profissionais.php # GET JSON: profissionais por serviço
-├── public_html/includes/             # PDO, repositories, helpers públicos e autenticação
-├── public_html/includes/slots.php    # geração de slots e validação de conflito
-├── public_html/includes/layout/home/ # partials da home (sobre, serviços e conteúdo complementar)
-├── public_html/static/               # CSS, JS público (calendar, agendar, confirmação)
+├── index.php                         # home PHP; consulta serviços e profissionais ativos
+├── agendar.php                       # fluxo de agendamento (form + calendário + POST)
+├── confirmacao-agendamento.php       # confirmação + link WhatsApp
+├── api/                              # JSON: profissionais, disponibilidade e horários livres
+├── includes/                         # PDO, repositories, helpers públicos e autenticação
+├── static/                           # CSS e JS público (calendar, agendar, confirmação)
 ├── src/index.tsx                     # legado — HTML da home como string Hono
 ├── src/renderer.tsx                  # legado
 ├── public/static/                     # CSS e JS atuais; origens preservadas até a Fase 8
@@ -127,16 +124,14 @@ Integridade e proteção contra overbooking:
 
 ---
 
-## 5. Organização de pastas alvo (`public_html/`)
+## 5. Organização de pastas alvo (raiz publicada pela Hostinger)
 
 ```text
-config.php                  # local secret file outside the public web root; Git-ignored
-
-public_html/
-├── index.php                # home — identidade visual atual, dados do banco
-├── agendar.php              # fluxo de agendamento (form + calendário)
-├── .htaccess                # nega acesso a config/includes; força HTTPS
-├── includes/
+config.php                  # segredo local, ignorado pelo Git e negado pelo .htaccess
+index.php                   # home — identidade visual atual, dados do banco
+agendar.php                 # fluxo de agendamento (form + calendário)
+.htaccess                   # nega acesso a config/includes/vendor/sql/tests/bin; força HTTPS
+includes/
 │   ├── db.php               # conexão PDO única + gerarUuid() (v7)
 │   ├── auth.php             # sessão, login/logout, 2FA, require_admin()
 │   ├── mailer.php           # envio via PHPMailer + SMTP Hostinger
@@ -147,36 +142,43 @@ public_html/
 │   └── layout/
 │       ├── admin.php         # topo/rodapé Bootstrap do painel
 │       └── home/             # head.php, top.php, about.php (Task 2)
-├── api/
-│   └── slots.php            # JSON: horários livres p/ serviço+profissional+data
-├── admin/
+api/
+├── slots.php                # JSON: horários livres p/ serviços+profissional+data
+└── disponibilidade.php      # JSON: dias do mês com horário disponível
+admin/
 │   ├── index.php            # dashboard (próximos agendamentos)
 │   ├── login.php · verificar.php · logout.php   # senha → código 2FA → painel
 │   ├── servicos.php
 │   ├── profissionais.php
 │   ├── disponibilidade.php
 │   └── agendamentos.php
-├── static/
+static/
 │   ├── style-01-foundation.css through style-06-footer-responsive.css # copy planned in Task 4
 │   ├── app.js               # interações públicas
 │   ├── admin.js             # interações do painel (Bootstrap)
 │   └── img/                 # imagens baixadas do genspark (Fase 6)
-├── vendor/                  # Composer (PHPMailer) — bloqueado no .htaccess
-└── favicon.svg
+vendor/                      # Composer (PHPMailer) — bloqueado no .htaccess e ignorado
+favicon.svg
 
-sql/                         # raiz do repositório — NÃO sobe para public_html
+sql/                         # raiz do repositório — bloqueado no .htaccess
 └── migrations/              # aplicadas em ordem via phpMyAdmin/CLI
     ├── 001_schema_inicial.sql   # tabelas + seed + tabela migracoes
     └── 002_limites_taxa.sql     # rate limit do login/2FA (e slots na Fase 4)
 
 bin/criar-admin.php          # CLI local: cria admin / redefine senha — NÃO sobe
 tests/                       # PHPUnit — NÃO sobe
-composer.json · phpunit.xml · phpstan.neon · phpcs.xml   # vendor-dir = public_html/vendor
+composer.json · phpunit.xml · phpstan.neon · phpcs.xml   # vendor-dir = vendor
 ```
 
-Ambiente local: Apache do XAMPP em `http://localhost:8080` com `DocumentRoot` em `public_html/` (VirtualHost com `AllowOverride All` e `Require local`), para o `.htaccess` valer igual à Hostinger. O `.htaccess` não força HTTPS em `localhost`, e o cookie de sessão só recebe `Secure` quando a conexão é HTTPS.
+No deploy Git da Hostinger, a raiz do repositório é publicada diretamente em `/public_html`; por isso a aplicação também fica na raiz local. Ambiente local: Apache do XAMPP em `http://localhost:8080` com `DocumentRoot` na raiz do repositório (VirtualHost com `AllowOverride All` e `Require local`). O `.htaccess` bloqueia os arquivos não públicos. O `.htaccess` não força HTTPS em `localhost`, e o cookie de sessão só recebe `Secure` quando a conexão é HTTPS.
 
-Convention: data access lives in `includes/`; `config.php` stays outside the document root and `.htaccess` blocks `includes/`.
+Convention: data access lives in `includes/`; `config.php` remains Git-ignored and the `.htaccess` blocks direct access to it and to backend directories.
+
+### Respostas de erro e manutenção
+
+O Apache encaminha `403`, `404`, `500`, `502`, `503` e `504` para entradas finas em `errors/`, que chamam um renderer único em `includes/errors.php`. O renderer não depende de sessão, banco, layout público ou serviços externos; define o status, `Content-Type` e `Cache-Control: no-store`, e escapa o identificador de atendimento do `500`.
+
+`includes/maintenance.php` consulta a chave booleana `maintenance_mode` de `config.php` antes de as entradas públicas abrirem o PDO. Quando ativa, páginas HTML recebem o renderer `503`; APIs recebem JSON `503` e `Retry-After: 3600`. O painel e login administrativo não usam esse guard, para que a manutenção possa ser encerrada. Respostas originadas antes de o Apache/PHP receber a requisição continuam sob controle da infraestrutura da Hostinger e podem exigir cópia equivalente no hPanel.
 
 ---
 
@@ -278,7 +280,7 @@ Telefone e e-mail de cliente são dados pessoais: nunca exibidos em página púb
 
 1. hPanel → criar banco MySQL + usuário; anotar credenciais.
 2. hPanel → Bancos → phpMyAdmin → importar os arquivos de `sql/migrations/` **em ordem numérica**, só os que ainda não constam em `SELECT * FROM migracoes`.
-3. Subir o conteúdo de `public_html/` (sem `sql/`) via Gerenciador de Arquivos ou FTP para a raiz `public_html`.
+3. No deploy Git da Hostinger, publicar a raiz do repositório diretamente em `public_html`; não criar uma pasta `public_html/` dentro do repositório. Em FTP ou Gerenciador de Arquivos, enviar apenas os arquivos públicos para a raiz `public_html`, preservando `config.php` privado no servidor.
 4. Editar `config.php` no servidor com as credenciais (não versionar).
 5. hPanel → SSL → ativar certificado grátis; forçar HTTPS no `.htaccess`.
 6. Testar: home, agendamento ponta a ponta, login admin, CRUD.
@@ -289,11 +291,11 @@ Sem passo de build: são arquivos PHP/CSS/JS servidos diretamente. O ESLint e os
 
 Correções de fechamento: `categorias_servicos(nome)` é cadastro independente adicionado pela migration 004; repositórios administrativos foram extraídos para `servicos-repository.php`, `profissionais-repository.php` e `disponibilidade-repository.php`, carregados pelo arquivo compatível `repositories.php`. O menu/confirmacões usa JS nativo local `admin-ui.js`, sem bundle remoto. Logs agora omitem mensagem bruta da exceção. Ver `CORRECOES-FASE-5.md` para gates e revalidação visual pendente.
 
-- Design: padrão aprovado `public_html/assets/img/{logo,icons,backgrounds,static}/`; ativos em `static/` permanecem legados até migração da Fase 6.
-- Conteúdo administrativo: `public_html/uploads/{servicos,profissionais}/`, nomes aleatórios, JPG/PNG/WEBP até 5 MB. Não confundir com ativos versionados de design; uploads exigem backup e preservação no deploy.
+- Design: padrão aprovado `assets/img/{logo,icons,backgrounds,static}/`; ativos em `static/` permanecem legados até migração da Fase 6.
+- Conteúdo administrativo: `uploads/{servicos,profissionais}/`, nomes aleatórios, JPG/PNG/WEBP até 5 MB. Não confundir com ativos versionados de design; uploads exigem backup e preservação no deploy.
 - Calendário: `disponibilidade_datas`, chave profissional/data, TEXT contendo JSON `{intervalo, horarios}`. Migration `003`; leitura de listas legadas como 30 min; regras semanais usadas somente em datas sem override. Intervalos 30/60 e duração arredondada reservam blocos contíguos. Ver [calendário](DISPONIBILIDADE-CALENDARIO.md).
 - Indicadores: consulta mensal agregada em `resumo-mensal-admin.php`; pizza SVG no servidor, sem dependência de JS. Quantidades não canceladas e estimativa de receita somente de concluídos, calculada pelo preço atual (não histórico financeiro).
-- Diagnóstico: páginas 403/404/500 e handler com request ID. Logs dependem de configuração PHP/Apache privada; sanitização ainda pendente.
+- Diagnóstico: páginas 403/404/500/502/503/504, handler com request ID escapado e modo de manutenção para HTML/JSON. Logs dependem de configuração PHP/Apache privada.
 - Somente papel `admin`; profissionais são entidades administradas, não usuários com credenciais próprias.
 
 Estado técnico e divergências da implementação: [revisão da Fase 5](REVISAO-FASE-5.md). Não considerar esses padrões integralmente validados enquanto R1–R6 estiverem abertos.

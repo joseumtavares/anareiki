@@ -8,7 +8,7 @@ final class ResponsiveNavigationTest extends TestCase
 {
     public function test_menu_mobile_fechado_recolhe_tambem_o_espacamento_vertical(): void
     {
-        $css = file_get_contents(__DIR__ . '/../public_html/static/style-06-footer-responsive.css');
+        $css = file_get_contents(__DIR__ . '/../static/style-06-footer-responsive.css');
         self::assertNotFalse($css);
 
         preg_match(

@@ -1,6 +1,6 @@
 export default [
   {
-    ignores: ['.agents/**', 'node_modules/**', 'public_html/vendor/**', 'dist/**'],
+    ignores: ['.agents/**', 'node_modules/**', 'vendor/**', 'dist/**'],
   },
   {
     files: ['**/*.{js,mjs,cjs,ts,tsx}'],

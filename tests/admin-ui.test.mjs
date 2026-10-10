@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
-const script = readFileSync(new URL('../public_html/static/admin-ui.js', import.meta.url), 'utf8');
+const script = readFileSync(new URL('../static/admin-ui.js', import.meta.url), 'utf8');
 
 test('menu mobile alterna abertura e estado acessível', () => {
   const handlers = {};

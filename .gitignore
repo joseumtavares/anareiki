@@ -32,9 +32,7 @@ lerna-debug.log*
 
 # php — segredos e dependências nunca versionados (RULES §10)
 /config.php
-public_html/config.php
-public_html/Config.php
-public_html/vendor/
+/vendor/
 .phpunit.cache/
 
 # misc

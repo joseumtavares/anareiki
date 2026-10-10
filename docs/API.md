@@ -70,17 +70,18 @@ Ainda assim, cada handler segue um contrato documentado (seção 5) para manter 
 - Status: **implementado** (Fase 4).
 - Visibilidade: **pública**.
 - Autenticação: não exige. **Exige token CSRF** válido.
-- Body (form-urlencoded): `servico_id` (UUID), `profissional_id` (UUID), `data`, `hora_inicio`, `cliente_nome`, `cliente_telefone`, `csrf_token`. Nota: `cliente_email` não é coletado nem gravado; `observacao` não é coletada (uso futuro do admin).
+- Body (form-urlencoded): `servico_ids[]` (lista de UUIDs sem repetição), `profissional_id` (UUID), `data`, `hora_inicio`, `cliente_nome`, `cliente_telefone`, `csrf_token`. Nota: `servico_id` continua aceito para compatibilidade; `cliente_email` não é coletado nem gravado; `observacao` não é coletada (uso futuro do admin).
 - Regras de validação no servidor (obrigatórias, não confiar no front):
   1. serviço e profissional existem e estão ativos, e o profissional faz o serviço;
   2. `hora_inicio` cai dentro de uma faixa de `disponibilidade` daquele dia da semana;
   3. o intervalo `[hora_inicio, hora_inicio + duracao_min)` **não colide** com agendamento existente do profissional na data;
   4. `data` não está no passado; nome e telefone preenchidos e saneados.
-- Resposta de sucesso: redireciona para página de confirmação (`303`), sem reenvio de formulário.
+- Resposta de sucesso (`200`): JSON com `whatsapp_url`, uma URL codificada para abrir o WhatsApp da empresa com o resumo do agendamento persistido. A home usa essa resposta para navegar diretamente ao WhatsApp, sem carregar uma página de confirmação intermediária. `GET /agendar.php` redireciona para `/` (`303`); o arquivo é exclusivamente o endpoint de confirmação.
 - Respostas de erro:
-  - `400`: dados inválidos → re-renderiza o formulário com mensagem clara.
   - `403`: CSRF inválido.
   - `409`: horário acabou de ser ocupado (corrida) → pede para escolher outro.
+  - `422`: dados inválidos, serviço inativo ou profissional incompatível.
+  - `500`: falha inesperada; a resposta não expõe detalhes internos.
 - Observações de segurança:
   - índice único `(profissional_id, data, hora_inicio)` no banco garante atomicidade (`409` capturado do `PDOException`);
   - telefone/e-mail do cliente nunca vão para log nem para URL.

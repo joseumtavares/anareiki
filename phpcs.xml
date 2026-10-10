@@ -5,20 +5,29 @@
     <arg name="colors"/>
     <arg value="sp"/>
 
-    <file>public_html</file>
+    <file>admin</file>
+    <file>api</file>
+    <file>includes</file>
+    <file>index.php</file>
+    <file>agendar.php</file>
+    <file>confirmacao-agendamento.php</file>
     <file>bin</file>
     <file>tests</file>
 
-    <exclude-pattern>public_html/vendor/*</exclude-pattern>
-    <exclude-pattern>public_html/config.php</exclude-pattern>
+    <exclude-pattern>vendor/*</exclude-pattern>
+    <exclude-pattern>config.php</exclude-pattern>
 
     <rule ref="PSR12"/>
 
     <!-- Páginas .php misturam HTML e PHP por desenho (monólito renderizado no servidor). -->
     <rule ref="PSR1.Files.SideEffects">
-        <exclude-pattern>public_html/admin/*</exclude-pattern>
+        <exclude-pattern>admin/*</exclude-pattern>
+        <exclude-pattern>api/*</exclude-pattern>
         <exclude-pattern>bin/*</exclude-pattern>
-        <exclude-pattern>public_html/includes/*</exclude-pattern>
+        <exclude-pattern>includes/*</exclude-pattern>
+        <exclude-pattern>index.php</exclude-pattern>
+        <exclude-pattern>agendar.php</exclude-pattern>
+        <exclude-pattern>confirmacao-agendamento.php</exclude-pattern>
         <exclude-pattern>tests/*</exclude-pattern>
     </rule>
     <!-- Testes PHPUnit permanecem no escopo global para acessar as funções legadas. -->

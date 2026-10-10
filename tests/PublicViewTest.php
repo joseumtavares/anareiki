@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
-$publicViewFile = __DIR__ . '/../public_html/includes/public-view.php';
+$publicViewFile = __DIR__ . '/../includes/public-view.php';
 if (is_file($publicViewFile)) {
     require_once $publicViewFile;
 }

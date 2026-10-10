@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../public_html/includes/db.php';
+require_once __DIR__ . '/../includes/db.php';
 
 final class UuidTest extends TestCase
 {

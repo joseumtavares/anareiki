@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../public_html/includes/db.php';
-require_once __DIR__ . '/../public_html/includes/repositories.php';
+require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/repositories.php';
 
 final class DisponibilidadeAdminRepositoryTest extends TestCase
 {

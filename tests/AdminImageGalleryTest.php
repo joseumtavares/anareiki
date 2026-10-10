@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../public_html/includes/uploads.php';
+require_once __DIR__ . '/../includes/uploads.php';
 
 final class AdminImageGalleryTest extends TestCase
 {
@@ -15,7 +15,7 @@ final class AdminImageGalleryTest extends TestCase
         $this->baseDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'reiki-gallery-' .
         bin2hex(random_bytes(4));
         mkdir($this->baseDir, 0775, true);
-        copy(__DIR__ . '/../public_html/favicon.svg', $this->baseDir . DIRECTORY_SEPARATOR .
+        copy(__DIR__ . '/../favicon.svg', $this->baseDir . DIRECTORY_SEPARATOR .
         'nao-imagem.svg');
         file_put_contents(
             $this->baseDir . DIRECTORY_SEPARATOR . 'foto.jpg',
