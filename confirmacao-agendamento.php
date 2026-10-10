@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/includes/db.php';
+configurarTratamentoErros();
 require_once __DIR__ . '/includes/maintenance.php';
 interromperSeEmManutencao(false);
 require_once __DIR__ . '/includes/repositories.php';
