@@ -58,15 +58,15 @@ As migrações são destinadas a um banco vazio. Não reaplique uma migração j
 
 ## 5. Configurar a aplicação PHP
 
-A aplicação lê `config.php` na raiz do repositório. Esse arquivo não é versionado porque contém credenciais; o modelo com a estrutura esperada está em `config.example.php`.
+A aplicação lê `config.php` fora da raiz pública: no diretório pai de `public_html`. Esse arquivo não é versionado porque contém credenciais; o modelo com a estrutura esperada está em `config.example.php`.
 
-1. Se `config.php` ainda não existir, copie `config.example.php` para `config.php` na raiz do repositório (ao lado de `composer.json`). Se ele já existir, preserve o arquivo e revise seus valores sem o substituir.
+1. Se `config.php` ainda não existir, copie `config.example.php` para o diretório pai da raiz publicada. Na Hostinger, use `../config.php` em relação a `public_html`; localmente, use o diretório pai do clone. Se ele já existir, preserve o arquivo e revise seus valores sem o substituir.
 2. Preencha `db` para o banco local: host `127.0.0.1`, nome `anareiki`, usuário `root` e a senha configurada no seu MySQL local (em uma instalação XAMPP padrão, normalmente vazia).
 3. Ajuste `debug` para `true` apenas no seu ambiente local.
 4. Mantenha `maintenance_mode` como `false`. Use `true` somente durante uma manutenção planejada e retorne imediatamente a `false` quando ela terminar.
 5. SMTP é opcional para abrir o site, mas é necessário para validar o fluxo de login/2FA por e-mail. Use credenciais de desenvolvimento autorizadas pela equipe. Nunca coloque segredos em commits, issues, documentação ou mensagens.
 
-O projeto **não carrega variáveis de ambiente `.env`** atualmente. Os nomes usados na configuração são as chaves do array PHP `debug`, `maintenance_mode`, `db.host`, `db.nome`, `db.usuario`, `db.senha`, `smtp.host`, `smtp.porta`, `smtp.usuario`, `smtp.senha` e `smtp.remetente_nome`. O arquivo `config.php` é a fonte desses valores; não crie `.env` esperando que a aplicação o leia.
+O projeto **não carrega variáveis de ambiente `.env`** atualmente. Os nomes usados na configuração são as chaves do array PHP `debug`, `maintenance_mode`, `db.host`, `db.nome`, `db.usuario`, `db.senha`, `smtp.host`, `smtp.porta`, `smtp.usuario`, `smtp.senha` e `smtp.remetente_nome`. O arquivo `config.php`, fora de `public_html`, é a fonte desses valores; não crie `.env` esperando que a aplicação o leia.
 
 ## 6. Configurar o Apache para servir a raiz do repositório
 

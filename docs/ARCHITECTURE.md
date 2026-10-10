@@ -281,7 +281,7 @@ Telefone e e-mail de cliente são dados pessoais: nunca exibidos em página púb
 1. hPanel → criar banco MySQL + usuário; anotar credenciais.
 2. hPanel → Bancos → phpMyAdmin → importar os arquivos de `sql/migrations/` **em ordem numérica**, só os que ainda não constam em `SELECT * FROM migracoes`.
 3. No deploy Git da Hostinger, publicar a raiz do repositório diretamente em `public_html`; não criar uma pasta `public_html/` dentro do repositório. Em FTP ou Gerenciador de Arquivos, enviar apenas os arquivos públicos para a raiz `public_html`, preservando `config.php` privado no servidor.
-4. Editar `config.php` no servidor com as credenciais (não versionar).
+4. Criar ou editar `config.php` no diretório pai de `public_html` com as credenciais (não versionar).
 5. hPanel → SSL → ativar certificado grátis; forçar HTTPS no `.htaccess`.
 6. Testar: home, agendamento ponta a ponta, login admin, CRUD.
 

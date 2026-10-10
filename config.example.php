@@ -1,7 +1,7 @@
 <?php
 
-// Modelo de configuração. Copie para config.php na raiz do projeto e preencha.
-// A configuração local é ignorada pelo Git e bloqueada pela raiz pública (.htaccess).
+// Modelo de configuração. Copie para ../config.php, fora de public_html, e preencha.
+// A configuração é ignorada pelo Git e nunca deve ficar acessível pela web.
 
 declare(strict_types=1);
 

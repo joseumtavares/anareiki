@@ -4,12 +4,33 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/errors.php';
 
+function caminhoConfiguracao(): string
+{
+    return dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'config.php';
+}
+
+/** @return array<string, mixed> */
+function carregarConfiguracao(?string $caminho = null): array
+{
+    $caminho ??= caminhoConfiguracao();
+    if (!is_file($caminho)) {
+        throw new RuntimeException('Configuração da aplicação indisponível.');
+    }
+
+    $configuracao = require $caminho;
+    if (!is_array($configuracao)) {
+        throw new RuntimeException('Configuração da aplicação inválida.');
+    }
+
+    return $configuracao;
+}
+
 /** @return array<string, mixed> */
 function config(): array
 {
     static $config = null;
     if ($config === null) {
-        $config = require dirname(__DIR__) . '/config.php';
+        $config = carregarConfiguracao();
         date_default_timezone_set('America/Sao_Paulo');
         ini_set('display_errors', $config['debug'] ? '1' : '0');
     }
